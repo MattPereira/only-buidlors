@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "../contracts/YourContract.sol";
 import "./DeployHelpers.s.sol";
+import {BuidlGuidlNft} from "../contracts/BuidlGuidlNft.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
     error InvalidPrivateKey(string);
@@ -15,13 +15,12 @@ contract DeployScript is ScaffoldETHDeploy {
             );
         }
         vm.startBroadcast(deployerPrivateKey);
-        YourContract yourContract = new YourContract(
-            vm.addr(deployerPrivateKey)
-        );
+
+        BuidlGuidlNft bgNft = new BuidlGuidlNft();
         console.logString(
             string.concat(
-                "YourContract deployed at: ",
-                vm.toString(address(yourContract))
+                "bgNft contract deployed at: ",
+                vm.toString(address(bgNft))
             )
         );
         vm.stopBroadcast();

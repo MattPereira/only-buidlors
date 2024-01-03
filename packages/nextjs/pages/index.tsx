@@ -1,60 +1,86 @@
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import type { NextPage } from "next";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth/";
 
 const Home: NextPage = () => {
+  ////////////////SVG NFT ////////////////////////
+  const [bgNft, setBgNft] = useState<any>(null);
+
+  const { data: base64encodedTokenUri } = useScaffoldContractRead({
+    contractName: "BuidlGuidlNft",
+    functionName: "tokenURI",
+    args: [0n],
+  });
+
+  useEffect(() => {
+    if (!base64encodedTokenUri) return;
+    // Decode the Base64 string
+    const decodedString = atob(base64encodedTokenUri);
+
+    // Parse the JSON metadata
+    const metadata = JSON.parse(decodedString);
+
+    // Set the NFT data
+    setBgNft(metadata);
+  }, [base64encodedTokenUri]);
+
+  /////////IPFS NFT /////////////////////////
+
+  const [nfts, setNfts] = useState<any[]>([]);
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("api/querySubgraph")
+      .then(res => res.json())
+      .then(async data => {
+        const minteds = data.data.minteds;
+        const nftPromises = minteds.map((minted: any) => {
+          const ipfsUrl = minted.tokenUri.replace("ipfs://", "https://ipfs.io/ipfs/");
+          return fetch(ipfsUrl).then(res => res.json());
+        });
+        const nftsData = await Promise.all(nftPromises);
+        console.log(nftsData);
+        const nftsDataFormatted = nftsData.map((nft: any) => {
+          if (nft.image.includes("ipfs://")) {
+            nft.image = nft.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+          }
+          return nft;
+        });
+        console.log(nftsDataFormatted);
+        setNfts(nftsDataFormatted);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  console.log(nfts);
+  console.log(bgNft);
+
   return (
     <>
       <MetaHeader />
-      <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center mb-8">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/pages/index.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
-        </div>
 
-        <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contract
-                </Link>{" "}
-                tab.
-              </p>
+      <h3 className="text-center mt-10 text-3xl">IPFS NFTs</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 m-10 gap-8">
+        {nfts &&
+          !isLoading &&
+          nfts.length > 0 &&
+          nfts.map(nft => (
+            <div key={nft.name} className="bg-base-300 rounded-xl">
+              <Image width={500} height={500} src={nft.image} alt={nft.name} className="rounded-xl" />
+              <h5 className="text-xl">{nft.name}</h5>
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-          </div>
-        </div>
+          ))}
+      </div>
+
+      <h3 className="text-center mt-10 text-3xl">SVG NFTs</h3>
+      <div className="px-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {bgNft && <Image width={500} height={500} src={bgNft.image} alt={bgNft.name} className="rounded-xl" />}
       </div>
     </>
   );
