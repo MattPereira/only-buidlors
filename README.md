@@ -3,10 +3,17 @@
 1. Impliment chainlink function to fetch build count from BG api
 2. Set up minting on frontend with mainnet ens lookup that is passed as arg to mint function
 3. Hook up subgraph for speedy display of the nft collection
-4. Figure out if account abstraction is possible for the minting to pay users mint fees
-5. Ship it
+4. Different color background depending on number of builds
+   1. 0 - 4 builds gets bronze
+   2. 5 - 9 builds gets silver
+   3. 10+ builds gets rainbow or gold
+5. Figure out if account abstraction is possible for the minting to pay users mint fees
 
 ## Resources
+
+### NFT metadata example
+
+- ipfs://bafybeibc5sgo2plmjkq2tzmhrn54bk3crhnc23zd2msg4ea7a4pxrkgfna/2222
 
 ### Subgraphs
 

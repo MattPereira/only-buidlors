@@ -9,7 +9,7 @@ const Home: NextPage = () => {
   const [bgNft, setBgNft] = useState<any>(null);
 
   const { data: base64encodedTokenUri } = useScaffoldContractRead({
-    contractName: "BuidlGuidlNft",
+    contractName: "BuidlCountNft",
     functionName: "tokenURI",
     args: [0n],
   });

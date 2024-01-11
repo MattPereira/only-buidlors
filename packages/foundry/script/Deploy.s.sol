@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "./DeployHelpers.s.sol";
-import {BuidlGuidlNft} from "../contracts/BuidlGuidlNft.sol";
+import {BuidlCountNft} from "../contracts/BuidlCountNft.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
     error InvalidPrivateKey(string);
@@ -16,11 +16,11 @@ contract DeployScript is ScaffoldETHDeploy {
         }
         vm.startBroadcast(deployerPrivateKey);
 
-        BuidlGuidlNft bgNft = new BuidlGuidlNft();
+        BuidlCountNft buidlCountNft = new BuidlCountNft();
         console.logString(
             string.concat(
                 "bgNft contract deployed at: ",
-                vm.toString(address(bgNft))
+                vm.toString(address(buidlCountNft))
             )
         );
         vm.stopBroadcast();
