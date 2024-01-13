@@ -1,8 +1,11 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.0;
 
 import "./DeployHelpers.s.sol";
+import {Script, console} from "forge-std/Script.sol";
 import {BuidlCountNft} from "../contracts/BuidlCountNft.sol";
+import {HelperConfig} from "./HelperConfig.s.sol";
+import {IFunctionsSubscriptions} from "@chainlink/contracts/src/v0.8/functions/dev/v1_X/interfaces/IFunctionsSubscriptions.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
     error InvalidPrivateKey(string);
@@ -14,15 +17,38 @@ contract DeployScript is ScaffoldETHDeploy {
                 "You don't have a deployer account. Make sure you have set DEPLOYER_PRIVATE_KEY in .env or use `yarn generate` to generate a new random account"
             );
         }
+
+        HelperConfig helperConfig = new HelperConfig();
+        (
+            address router,
+            bytes32 donId,
+            uint64 subscriptionId,
+            uint32 gasLimit
+        ) = helperConfig.activeNetworkConfig();
+
+        console.log("router:", router);
+        // console.logBytes(donId);
+        console.log("subscriptionId:", subscriptionId);
+        console.log("gasLimit:", gasLimit);
+
         vm.startBroadcast(deployerPrivateKey);
 
-        BuidlCountNft buidlCountNft = new BuidlCountNft();
-        console.logString(
-            string.concat(
-                "bgNft contract deployed at: ",
-                vm.toString(address(buidlCountNft))
-            )
+        BuidlCountNft buidlCountNft = new BuidlCountNft(
+            router,
+            donId,
+            gasLimit
         );
+        console.log(
+            "BuidlGuild NFT contract deployed at: ",
+            address(buidlCountNft)
+        );
+
+        IFunctionsSubscriptions chainlinkRouter = IFunctionsSubscriptions(
+            router
+        );
+
+        chainlinkRouter.addConsumer(subscriptionId, address(buidlCountNft));
+
         vm.stopBroadcast();
 
         /**

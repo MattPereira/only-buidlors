@@ -1,41 +1,115 @@
 // SPDX-License-Identifier: MIT
 
+// Layout of Contract:
+// version
+// imports
+// errors
+// interfaces, libraries, contracts
+// Type declarations
+// State variables
+// Events
+// Modifiers
+// Functions
+
+// Layout of Functions:
+// constructor
+// receive function (if exists)
+// fallback function (if exists)
+// external
+// public
+// internal
+// private
+// internal & private view & pure functions
+// external & public view & pure functions
+
 pragma solidity ^0.8.0;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_X/FunctionsClient.sol";
+import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_X/libraries/FunctionsRequest.sol";
+import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 
 /**
- * MemberData.ensName sourced from frontend that queries mainnet ens registry
- * MemberData.buildCount comes from chainlink function
+ * Dynamic SVG NFT for Buidl Guidl members only
+ * @notice background color changes based on buildCount which is set by chainlink function
+ * @notice MemberData.ensName sourced from frontend that queries mainnet ens registry
  */
-contract BuidlCountNft is ERC721 {
+contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
+    using FunctionsRequest for FunctionsRequest.Request;
+
+    /*** Errors ***/
+    error UnexpectedRequestID(bytes32 requestId);
+
+    /*** Types ***/
     struct MemberData {
         string ensName;
         uint8 buildCount;
     }
 
+    /*** State Variables ***/
     mapping(address => MemberData) public s_memberToData;
-    mapping(address => bool) private hasMinted;
+    mapping(address => bool) private s_hasMinted;
     uint256 private s_tokenCounter;
-    string private constant base64EncodedSvgPrefix =
+    string private constant s_base64EncodedSvgPrefix =
         "data:image/svg+xml;base64,";
+    string private constant s_beginnerColor = "#52525b";
+    string private constant s_intermediateColor = "#2563eb";
+    string private constant s_expertColor = "#4f46e5";
+    // associated with chainlink function
+    mapping(bytes32 => address) public s_requestIdToMemberAddress;
+    bytes32 public s_lastRequestId;
+    bytes public s_lastResponse;
+    bytes public s_lastError;
+    uint32 public s_gasLimit;
+    bytes32 public s_donID;
+    string source =
+        "const buidlGiudlURL = `https://buidlguidl-v3.appspot.com/builders/${args[0]}`"
+        "const apiResponse = await Functions.makeHttpRequest({"
+        "  url: buidlGiudlURL,"
+        "  method: 'GET',"
+        "})"
+        "if (apiResponse.error) {"
+        "throw Error('request failed');"
+        "}"
+        "const buildCount = 0;"
+        "if(apiResponse.data.builds) {"
+        "  buildCount = apiResponse.data.builds.length;"
+        "}"
+        "return Functions.encodeUint256(buildCount)";
 
-    string public zeroToFourBuilds = "#52525b";
-    string public fiveToNineBuilds = "#2563eb";
-    string public tenPlusBuilds = "#4f46e5";
+    /*** Events ***/
+    event Response(
+        bytes32 indexed requestId,
+        address indexed member,
+        uint256 indexed buildCount,
+        bytes response,
+        bytes err
+    );
 
     /**
-     * First NFT minted has tokenId of 0
+     * @param router address of chainlink router
+     * @param donId lookup in chainlink docs per network
+     * @param gasLimit max gas that can be spent during response callback function
      */
-    constructor() ERC721("Buidl Counter", "BDLC") {
-        s_tokenCounter = 0;
+    constructor(
+        address router,
+        bytes32 donId,
+        uint32 gasLimit
+    )
+        FunctionsClient(router)
+        ConfirmedOwner(msg.sender)
+        ERC721("Buidl Counter", "BDLC")
+    {
+        s_tokenCounter = 0; // first NFT minted has tokenId of 0
+        s_donID = donId;
+        s_gasLimit = gasLimit;
     }
 
     /**
-     *  Had to split encoding of image uri string into two parts to avoid "stack too deep" error caused by huge string concat and encoding in single function
-     *
+     * @notice split encoding of image uri string into two parts to avoid "stack too deep" error caused by huge string concat and encoding in single function
+     * @param tokenId looks up owner address to lookup buildCount to determine background color
      */
     function svgToImageURI(
         uint256 tokenId
@@ -44,11 +118,11 @@ contract BuidlCountNft is ERC721 {
 
         string memory color;
         if (s_memberToData[ownerAddr].buildCount < 5) {
-            color = zeroToFourBuilds;
+            color = s_beginnerColor;
         } else if (s_memberToData[ownerAddr].buildCount < 10) {
-            color = fiveToNineBuilds;
+            color = s_intermediateColor;
         } else {
-            color = tenPlusBuilds;
+            color = s_expertColor;
         }
         string memory svgTop = buildSvgTop(color);
         string memory svgBottom = buildSvgBottom(color, tokenId);
@@ -56,14 +130,14 @@ contract BuidlCountNft is ERC721 {
             bytes(string(abi.encodePacked(svgTop, svgBottom)))
         );
         return
-            string(abi.encodePacked(base64EncodedSvgPrefix, svgBase64Encoded));
+            string(
+                abi.encodePacked(s_base64EncodedSvgPrefix, svgBase64Encoded)
+            );
     }
 
     /**
      *  The top half of the svg that shows above the ens name display
-     * 
      * @param backgroundColor used to fill background of svg and text of ensName
-
      */
     function buildSvgTop(
         string memory backgroundColor
@@ -86,7 +160,8 @@ contract BuidlCountNft is ERC721 {
     }
 
     /**
-     * @notice addressString is used as fallback if ensName is not set
+     * The bottom half of the svg that shows ensName and buildCount
+     * @notice addressString is only used as fallback if ensName is absent
      * @param textColor text color for buildCount number (matches the background color)
      * @param tokenId to get the address of the NFT owner used to lookup dynamic ens name and buildCount
      */
@@ -95,12 +170,7 @@ contract BuidlCountNft is ERC721 {
         uint256 tokenId
     ) private view returns (string memory) {
         address ownerAddr = ownerOf(tokenId);
-
-        string memory buildCountString = Strings.toString(
-            s_memberToData[ownerAddr].buildCount
-        );
         string memory ensName = s_memberToData[ownerAddr].ensName;
-
         string memory identity;
         if (bytes(ensName).length == 0) {
             string memory addressString = Strings.toHexString(
@@ -128,6 +198,9 @@ contract BuidlCountNft is ERC721 {
             );
         }
 
+        string memory buildCountString = Strings.toString(
+            s_memberToData[ownerAddr].buildCount
+        );
         return
             string(
                 abi.encodePacked(
@@ -144,20 +217,77 @@ contract BuidlCountNft is ERC721 {
             );
     }
 
+    function initMember(string memory _ensName) external {
+        s_memberToData[msg.sender] = MemberData({
+            ensName: _ensName,
+            buildCount: 0
+        });
+    }
+
+    /** @notice sends request to chainlink node for off chain execution of JS source code
+     * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
+     * @param args the arguments to pass to the javascript source code
+     */
+    function sendRequest(
+        uint64 subscriptionId,
+        string[] calldata args
+    ) external returns (bytes32 requestId) {
+        FunctionsRequest.Request memory req;
+        req._initializeRequestForInlineJavaScript(source); // Initialize the request with JS code
+        if (args.length > 0) req._setArgs(args); // Set the arguments for the request
+        // Send the request and store the request ID
+        s_lastRequestId = _sendRequest(
+            req._encodeCBOR(),
+            subscriptionId,
+            s_gasLimit,
+            s_donID
+        );
+        s_requestIdToMemberAddress[s_lastRequestId] = msg.sender;
+        return s_lastRequestId;
+    }
+
+    /**
+     * @notice Callback function for fulfilling a request
+     * @param requestId The ID of the request to fulfill
+     * @param response The HTTP response data
+     * @param err Any errors from the Functions request
+     */
+    function _fulfillRequest(
+        bytes32 requestId,
+        bytes memory response,
+        bytes memory err
+    ) internal override {
+        if (s_lastRequestId != requestId) {
+            revert UnexpectedRequestID(requestId); // Check if request IDs match
+        }
+        address member = s_requestIdToMemberAddress[requestId];
+        uint256 buildCount = abi.decode(response, (uint256));
+        s_memberToData[member].buildCount = uint8(buildCount);
+        s_lastResponse = response;
+        s_lastError = err;
+
+        emit Response(
+            requestId,
+            member,
+            buildCount,
+            s_lastResponse,
+            s_lastError
+        );
+    }
+
     /**
      * 1. send chainlink function request to get member data
      * 2. update state variable mappings with member data
      * 3. mint new NFT
      *
      */
-    function minNft(uint8 _buidlCount) public {
-        require(!hasMinted[msg.sender], "Address has already minted an NFT");
-        s_memberToData[msg.sender] = MemberData({
-            ensName: "",
-            buildCount: uint8(_buidlCount)
-        });
+    function minNft() public {
+        require(
+            !s_hasMinted[msg.sender],
+            "This BuidlGuidl member has already minted an NFT"
+        );
         _safeMint(msg.sender, s_tokenCounter);
-        hasMinted[msg.sender] = true;
+        s_hasMinted[msg.sender] = true;
         s_tokenCounter++;
     }
 
@@ -180,7 +310,7 @@ contract BuidlCountNft is ERC721 {
                             abi.encodePacked(
                                 '{"name": "',
                                 name(),
-                                '", "description": "Dynamic SVG NFT for Buidl Guidl members only", "attributes": [{"trait_type": "coolness", "value": "100"}], "image": "',
+                                '", "description": "Dynamic SVG NFT that tracks BuidlGuidl member data", "attributes": [{"trait_type": "coolness", "value": "100"}], "image": "',
                                 imageURI,
                                 '"}'
                             )

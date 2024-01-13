@@ -27,45 +27,48 @@ const Home: NextPage = () => {
   }, [base64encodedTokenUri]);
 
   /////////IPFS NFT /////////////////////////
+  /**
+   * This is an example of how to query the subgraph endpoint for NFT data
+   */
 
-  const [nfts, setNfts] = useState<any[]>([]);
-  const [isLoading, setLoading] = useState(true);
+  // const [nfts, setNfts] = useState<any[]>([]);
+  // const [isLoading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("api/querySubgraph")
-      .then(res => res.json())
-      .then(async data => {
-        const minteds = data.data.minteds;
-        const nftPromises = minteds.map((minted: any) => {
-          const ipfsUrl = minted.tokenUri.replace("ipfs://", "https://ipfs.io/ipfs/");
-          return fetch(ipfsUrl).then(res => res.json());
-        });
-        const nftsData = await Promise.all(nftPromises);
-        console.log(nftsData);
-        const nftsDataFormatted = nftsData.map((nft: any) => {
-          if (nft.image.includes("ipfs://")) {
-            nft.image = nft.image.replace("ipfs://", "https://ipfs.io/ipfs/");
-          }
-          return nft;
-        });
-        console.log(nftsDataFormatted);
-        setNfts(nftsDataFormatted);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        setLoading(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   fetch("api/querySubgraph")
+  //     .then(res => res.json())
+  //     .then(async data => {
+  //       const minteds = data.data.minteds;
+  //       const nftPromises = minteds.map((minted: any) => {
+  //         const ipfsUrl = minted.tokenUri.replace("ipfs://", "https://ipfs.io/ipfs/");
+  //         return fetch(ipfsUrl).then(res => res.json());
+  //       });
+  //       const nftsData = await Promise.all(nftPromises);
+  //       console.log(nftsData);
+  //       const nftsDataFormatted = nftsData.map((nft: any) => {
+  //         if (nft.image.includes("ipfs://")) {
+  //           nft.image = nft.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+  //         }
+  //         return nft;
+  //       });
+  //       console.log(nftsDataFormatted);
+  //       setNfts(nftsDataFormatted);
+  //       setLoading(false);
+  //     })
+  //     .catch(error => {
+  //       console.error("Error:", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
+  // console.log(nfts);
 
-  console.log(nfts);
   console.log(bgNft);
 
   return (
     <>
       <MetaHeader />
 
-      <h3 className="text-center mt-10 text-3xl">IPFS NFTs</h3>
+      {/* <h3 className="text-center mt-10 text-3xl">IPFS NFTs</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 m-10 gap-8">
         {nfts &&
           !isLoading &&
@@ -76,7 +79,7 @@ const Home: NextPage = () => {
               <h5 className="text-xl">{nft.name}</h5>
             </div>
           ))}
-      </div>
+      </div> */}
 
       <h3 className="text-center mt-10 text-3xl">SVG NFTs</h3>
       <div className="px-10 grid grid-cols-1 lg:grid-cols-3 gap-8">

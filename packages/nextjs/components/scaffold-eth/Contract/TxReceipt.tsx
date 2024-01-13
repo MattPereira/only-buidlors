@@ -39,7 +39,7 @@ export const TxReceipt = (
         <div className="collapse-title text-sm min-h-0 py-1.5 pl-1">
           <strong>Transaction Receipt</strong>
         </div>
-        <div className="collapse-content overflow-auto bg-secondary rounded-t-none rounded-3xl">
+        <div className="collapse-content overflow-auto bg-secondary text-white rounded-t-none rounded-3xl">
           <pre className="text-xs pt-4">{displayTxResult(txResult)}</pre>
         </div>
       </div>
