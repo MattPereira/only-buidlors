@@ -684,6 +684,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getEnsName",
+          inputs: [
+            {
+              name: "_memberAddr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "handleOracleFulfillment",
           inputs: [
             {
@@ -700,19 +719,6 @@ const deployedContracts = {
               name: "err",
               type: "bytes",
               internalType: "bytes",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "initMember",
-          inputs: [
-            {
-              name: "_ensName",
-              type: "string",
-              internalType: "string",
             },
           ],
           outputs: [],
@@ -822,19 +828,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "s_lastError",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "bytes",
-              internalType: "bytes",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "s_lastRequestId",
           inputs: [],
           outputs: [
@@ -842,19 +835,6 @@ const deployedContracts = {
               name: "",
               type: "bytes32",
               internalType: "bytes32",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "s_lastResponse",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "bytes",
-              internalType: "bytes",
             },
           ],
           stateMutability: "view",
@@ -979,6 +959,11 @@ const deployedContracts = {
               name: "args",
               type: "string[]",
               internalType: "string[]",
+            },
+            {
+              name: "ensName",
+              type: "string",
+              internalType: "string",
             },
           ],
           outputs: [
@@ -1241,26 +1226,14 @@ const deployedContracts = {
             {
               name: "member",
               type: "address",
-              indexed: false,
+              indexed: true,
               internalType: "address",
             },
             {
               name: "buildCount",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
-            },
-            {
-              name: "response",
-              type: "bytes",
-              indexed: false,
-              internalType: "bytes",
-            },
-            {
-              name: "err",
-              type: "bytes",
-              indexed: false,
-              internalType: "bytes",
             },
           ],
           anonymous: false,
@@ -1464,7 +1437,7 @@ const deployedContracts = {
   },
   80001: {
     BuidlCountNft: {
-      address: "0xf2d7f653063B1741c37C5938633aa56A0E42d07b",
+      address: "0xa56277Aff8925a34a46b93799C68F45DA209C71E",
       abi: [
         {
           type: "constructor",
@@ -1571,6 +1544,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getEnsName",
+          inputs: [
+            {
+              name: "_memberAddr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "handleOracleFulfillment",
           inputs: [
             {
@@ -1587,19 +1579,6 @@ const deployedContracts = {
               name: "err",
               type: "bytes",
               internalType: "bytes",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "initMember",
-          inputs: [
-            {
-              name: "_ensName",
-              type: "string",
-              internalType: "string",
             },
           ],
           outputs: [],
@@ -1709,19 +1688,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "s_lastError",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "bytes",
-              internalType: "bytes",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "s_lastRequestId",
           inputs: [],
           outputs: [
@@ -1729,19 +1695,6 @@ const deployedContracts = {
               name: "",
               type: "bytes32",
               internalType: "bytes32",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "s_lastResponse",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "bytes",
-              internalType: "bytes",
             },
           ],
           stateMutability: "view",
@@ -1866,6 +1819,11 @@ const deployedContracts = {
               name: "args",
               type: "string[]",
               internalType: "string[]",
+            },
+            {
+              name: "ensName",
+              type: "string",
+              internalType: "string",
             },
           ],
           outputs: [
@@ -2128,26 +2086,14 @@ const deployedContracts = {
             {
               name: "member",
               type: "address",
-              indexed: false,
+              indexed: true,
               internalType: "address",
             },
             {
               name: "buildCount",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
-            },
-            {
-              name: "response",
-              type: "bytes",
-              indexed: false,
-              internalType: "bytes",
-            },
-            {
-              name: "err",
-              type: "bytes",
-              indexed: false,
-              internalType: "bytes",
             },
           ],
           anonymous: false,
@@ -2351,7 +2297,7 @@ const deployedContracts = {
   },
   421614: {
     BuidlCountNft: {
-      address: "0x52F2A79C0dC75aF4333158Ea563e7b2F0eB1F221",
+      address: "0x8891F910D28523C03e3a0Bca336212446cB39B37",
       abi: [
         {
           type: "constructor",
@@ -2458,6 +2404,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getEnsName",
+          inputs: [
+            {
+              name: "_memberAddr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "handleOracleFulfillment",
           inputs: [
             {
@@ -2474,19 +2439,6 @@ const deployedContracts = {
               name: "err",
               type: "bytes",
               internalType: "bytes",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "initMember",
-          inputs: [
-            {
-              name: "_ensName",
-              type: "string",
-              internalType: "string",
             },
           ],
           outputs: [],
@@ -2596,19 +2548,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "s_lastError",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "bytes",
-              internalType: "bytes",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
           name: "s_lastRequestId",
           inputs: [],
           outputs: [
@@ -2616,19 +2555,6 @@ const deployedContracts = {
               name: "",
               type: "bytes32",
               internalType: "bytes32",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "s_lastResponse",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "bytes",
-              internalType: "bytes",
             },
           ],
           stateMutability: "view",
@@ -2753,6 +2679,11 @@ const deployedContracts = {
               name: "args",
               type: "string[]",
               internalType: "string[]",
+            },
+            {
+              name: "ensName",
+              type: "string",
+              internalType: "string",
             },
           ],
           outputs: [
@@ -3015,26 +2946,14 @@ const deployedContracts = {
             {
               name: "member",
               type: "address",
-              indexed: false,
+              indexed: true,
               internalType: "address",
             },
             {
               name: "buildCount",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
-            },
-            {
-              name: "response",
-              type: "bytes",
-              indexed: false,
-              internalType: "bytes",
-            },
-            {
-              name: "err",
-              type: "bytes",
-              indexed: false,
-              internalType: "bytes",
             },
           ],
           anonymous: false,

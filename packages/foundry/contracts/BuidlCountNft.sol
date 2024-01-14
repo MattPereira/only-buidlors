@@ -60,8 +60,8 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
     // associated with chainlink function
     mapping(bytes32 => address) public s_requestIdToMemberAddress;
     bytes32 public s_lastRequestId;
-    bytes public s_lastResponse;
-    bytes public s_lastError;
+    // bytes public s_lastResponse;
+    // bytes public s_lastError;
     uint32 public s_gasLimit;
     bytes32 public s_donID;
     string public s_source =
@@ -82,10 +82,8 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
     /*** Events ***/
     event Response(
         bytes32 indexed requestId,
-        address member,
-        uint256 buildCount,
-        bytes response,
-        bytes err
+        address indexed member,
+        uint256 indexed buildCount
     );
 
     /**
@@ -105,6 +103,33 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
         s_tokenCounter = 0; // first NFT minted has tokenId of 0
         s_donID = donId;
         s_gasLimit = gasLimit;
+    }
+
+    /**
+     * @param tokenId used to select background color
+     */
+    function tokenURI(
+        uint256 tokenId
+    ) public view override returns (string memory) {
+        require(tokenId < s_tokenCounter, "Token id does not exist.");
+        string memory imageURI = svgToImageURI(tokenId);
+        return
+            string(
+                abi.encodePacked(
+                    _baseURI(),
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name": "',
+                                name(),
+                                '", "description": "Dynamic SVG NFT that tracks BuidlGuidl member data", "attributes": [{"trait_type": "coolness", "value": "100"}], "image": "',
+                                imageURI,
+                                '"}'
+                            )
+                        )
+                    )
+                )
+            );
     }
 
     /**
@@ -217,20 +242,15 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
             );
     }
 
-    function initMember(string memory _ensName) external {
-        s_memberToData[msg.sender] = MemberData({
-            ensName: _ensName,
-            buildCount: 0
-        });
-    }
-
     /** @notice sends request to chainlink node for off chain execution of JS source code
      * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
      * @param args the arguments to pass to the javascript source code
+     * @param ensName ens name resolved by frontend and passed in as an argument for updating the svg
      */
     function sendRequest(
         uint64 subscriptionId,
-        string[] calldata args
+        string[] calldata args,
+        string memory ensName
     ) external returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
@@ -243,6 +263,7 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
             s_donID
         );
         s_requestIdToMemberAddress[s_lastRequestId] = msg.sender;
+        s_memberToData[msg.sender].ensName = ensName;
         return s_lastRequestId;
     }
 
@@ -250,12 +271,12 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
      * @notice Callback function for fulfilling a request
      * @param requestId The ID of the request to fulfill
      * @param response The HTTP response data
-     * @param err Any errors from the Functions request
+     * @ param err Any errors from the Functions request
      */
     function fulfillRequest(
         bytes32 requestId,
         bytes memory response,
-        bytes memory err
+        bytes memory /* err */
     ) internal override {
         if (s_lastRequestId != requestId) {
             revert UnexpectedRequestID(requestId); // Check if request IDs match
@@ -263,22 +284,10 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
         address member = s_requestIdToMemberAddress[requestId];
         uint256 buildCount = abi.decode(response, (uint256));
         s_memberToData[member].buildCount = buildCount;
-        s_lastResponse = response;
-        s_lastError = err;
-
-        emit Response(
-            requestId,
-            member,
-            buildCount,
-            s_lastResponse,
-            s_lastError
-        );
+        emit Response(requestId, member, buildCount);
     }
 
     /**
-     * 1. send chainlink function request to get member data
-     * 2. update state variable mappings with member data
-     * 3. mint new NFT
      *
      */
     function minNft() public {
@@ -286,41 +295,23 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
             !s_hasMinted[msg.sender],
             "This BuidlGuidl member has already minted an NFT"
         );
+        require(
+            s_memberToData[msg.sender].buildCount > 0,
+            "Must ship at least one build to earn NFT"
+        );
         _safeMint(msg.sender, s_tokenCounter);
         s_hasMinted[msg.sender] = true;
         s_tokenCounter++;
     }
 
-    /**
-     * @dev "ownerOf" inhereted from ERC721 contract
-     * @param tokenId used to select background color
-     */
-    function tokenURI(
-        uint256 tokenId
-    ) public view override returns (string memory) {
-        require(tokenId < s_tokenCounter, "Token id does not exist.");
-        string memory imageURI = svgToImageURI(tokenId);
-
-        return
-            string(
-                abi.encodePacked(
-                    _baseURI(),
-                    Base64.encode(
-                        bytes(
-                            abi.encodePacked(
-                                '{"name": "',
-                                name(),
-                                '", "description": "Dynamic SVG NFT that tracks BuidlGuidl member data", "attributes": [{"trait_type": "coolness", "value": "100"}], "image": "',
-                                imageURI,
-                                '"}'
-                            )
-                        )
-                    )
-                )
-            );
-    }
-
+    // Getters
     function getBuidlCount(address _memberAddr) public view returns (uint256) {
         return s_memberToData[_memberAddr].buildCount;
+    }
+
+    function getEnsName(
+        address _memberAddr
+    ) public view returns (string memory) {
+        return s_memberToData[_memberAddr].ensName;
     }
 }

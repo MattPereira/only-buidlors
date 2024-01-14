@@ -81,7 +81,7 @@ const Home: NextPage = () => {
           ))}
       </div> */}
 
-      <h3 className="text-center mt-10 text-3xl">SVG NFTs</h3>
+      <h3 className="text-center my-14 text-6xl font-bold">BUIDLER NFT</h3>
       <div className="px-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {bgNft && <Image width={500} height={500} src={bgNft.image} alt={bgNft.name} className="rounded-xl" />}
       </div>

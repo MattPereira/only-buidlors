@@ -7,6 +7,8 @@ import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
+// import BuidlGuidlLogo from "~~/public/logo.svg";
+
 type HeaderMenuLink = {
   label: string;
   href: string;
@@ -14,10 +16,6 @@ type HeaderMenuLink = {
 };
 
 export const menuLinks: HeaderMenuLink[] = [
-  {
-    label: "Home",
-    href: "/",
-  },
   {
     label: "Debug Contracts",
     href: "/debug",
@@ -38,7 +36,7 @@ export const HeaderMenuLinks = () => {
               href={href}
               passHref
               className={`
-              text-xl text-white active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col`}
+              text-xl active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col`}
             >
               {icon}
               <span>{label}</span>
@@ -62,12 +60,11 @@ export const Header = () => {
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
   );
+  console.log("isDarkMode", isDarkMode);
 
   return (
     <div
-      className={`${
-        isDarkMode ? "bg-base-300" : "bg-secondary"
-      } sticky border-b border-primary lg:static top-0 navbar min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2`}
+      className={`bg-base-300 sticky border-b border-primary lg:static top-0 navbar min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2`}
     >
       <div className="navbar-start w-auto lg:w-1/2">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
@@ -96,7 +93,10 @@ export const Header = () => {
           <div className="flex relative w-10 h-10">
             <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
           </div>
-          <div className="flex flex-col text-xl font-bold text-white">BUIDL COUNT NFT</div>
+          <div className="flex flex-col">
+            <span className="font-bold leading-tight">Scaffold-ETH</span>
+            <span className="text-xs">Ethereum dev stack</span>
+          </div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
           <HeaderMenuLinks />
