@@ -27,9 +27,9 @@ pragma solidity ^0.8.0;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_X/FunctionsClient.sol";
-import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_X/libraries/FunctionsRequest.sol";
+import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/FunctionsClient.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
+import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/libraries/FunctionsRequest.sol";
 
 /**
  * Dynamic SVG NFT for Buidl Guidl members only
@@ -45,7 +45,7 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
     /*** Types ***/
     struct MemberData {
         string ensName;
-        uint8 buildCount;
+        uint256 buildCount;
     }
 
     /*** State Variables ***/
@@ -64,26 +64,26 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
     bytes public s_lastError;
     uint32 public s_gasLimit;
     bytes32 public s_donID;
-    string source =
-        "const buidlGiudlURL = `https://buidlguidl-v3.appspot.com/builders/${args[0]}`"
+    string public s_source =
+        "const address = args[0];"
         "const apiResponse = await Functions.makeHttpRequest({"
-        "  url: buidlGiudlURL,"
-        "  method: 'GET',"
-        "})"
+        "url: `https://buidlguidl-v3.appspot.com/builders/${address}`"
+        "});"
         "if (apiResponse.error) {"
         "throw Error('request failed');"
         "}"
-        "const buildCount = 0;"
-        "if(apiResponse.data.builds) {"
-        "  buildCount = apiResponse.data.builds.length;"
+        "const { data } = apiResponse;"
+        "let buildCount = 0;"
+        "if(data.builds) {"
+        " buildCount = data.builds.length;"
         "}"
-        "return Functions.encodeUint256(buildCount)";
+        "return Functions.encodeUint256(buildCount);";
 
     /*** Events ***/
     event Response(
         bytes32 indexed requestId,
-        address indexed member,
-        uint256 indexed buildCount,
+        address member,
+        uint256 buildCount,
         bytes response,
         bytes err
     );
@@ -233,11 +233,11 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
         string[] calldata args
     ) external returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
-        req._initializeRequestForInlineJavaScript(source); // Initialize the request with JS code
-        if (args.length > 0) req._setArgs(args); // Set the arguments for the request
+        req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
+        if (args.length > 0) req.setArgs(args); // Set the arguments for the request
         // Send the request and store the request ID
         s_lastRequestId = _sendRequest(
-            req._encodeCBOR(),
+            req.encodeCBOR(),
             subscriptionId,
             s_gasLimit,
             s_donID
@@ -252,7 +252,7 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
      * @param response The HTTP response data
      * @param err Any errors from the Functions request
      */
-    function _fulfillRequest(
+    function fulfillRequest(
         bytes32 requestId,
         bytes memory response,
         bytes memory err
@@ -262,7 +262,7 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
         }
         address member = s_requestIdToMemberAddress[requestId];
         uint256 buildCount = abi.decode(response, (uint256));
-        s_memberToData[member].buildCount = uint8(buildCount);
+        s_memberToData[member].buildCount = buildCount;
         s_lastResponse = response;
         s_lastError = err;
 
@@ -320,7 +320,7 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
             );
     }
 
-    function getBuidlCount(address _memberAddr) public view returns (uint8) {
+    function getBuidlCount(address _memberAddr) public view returns (uint256) {
         return s_memberToData[_memberAddr].buildCount;
     }
 }

@@ -5,7 +5,7 @@ import "./DeployHelpers.s.sol";
 import {Script, console} from "forge-std/Script.sol";
 import {BuidlCountNft} from "../contracts/BuidlCountNft.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
-import {IFunctionsSubscriptions} from "@chainlink/contracts/src/v0.8/functions/dev/v1_X/interfaces/IFunctionsSubscriptions.sol";
+import {IFunctionsSubscriptions} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/interfaces/IFunctionsSubscriptions.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
     error InvalidPrivateKey(string);
