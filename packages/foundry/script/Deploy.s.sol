@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./DeployHelpers.s.sol";
 import {Script, console} from "forge-std/Script.sol";
-import {BuidlCountNft} from "../contracts/BuidlCountNft.sol";
+import {OnlyBuildorsNft} from "../contracts/OnlyBuildorsNft.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 import {IFunctionsSubscriptions} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/interfaces/IFunctionsSubscriptions.sol";
 
@@ -33,21 +33,21 @@ contract DeployScript is ScaffoldETHDeploy {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        BuidlCountNft buidlCountNft = new BuidlCountNft(
+        OnlyBuildorsNft onlyBuildorsNft = new OnlyBuildorsNft(
             router,
             donId,
             gasLimit
         );
         console.log(
             "BuidlGuild NFT contract deployed at: ",
-            address(buidlCountNft)
+            address(onlyBuildorsNft)
         );
 
         IFunctionsSubscriptions chainlinkRouter = IFunctionsSubscriptions(
             router
         );
 
-        chainlinkRouter.addConsumer(subscriptionId, address(buidlCountNft));
+        chainlinkRouter.addConsumer(subscriptionId, address(onlyBuildorsNft));
 
         vm.stopBroadcast();
 

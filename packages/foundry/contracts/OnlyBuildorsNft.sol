@@ -36,7 +36,7 @@ import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0
  * @notice background color changes based on buildCount which is set by chainlink function
  * @notice MemberData.ensName sourced from frontend that queries mainnet ens registry
  */
-contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
+contract OnlyBuildorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     using FunctionsRequest for FunctionsRequest.Request;
 
     /*** Errors ***/
@@ -54,9 +54,10 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
     uint256 private s_tokenCounter;
     string private constant s_base64EncodedSvgPrefix =
         "data:image/svg+xml;base64,";
-    string private constant s_beginnerColor = "#52525b";
-    string private constant s_intermediateColor = "#2563eb";
-    string private constant s_expertColor = "#4f46e5";
+    string private constant s_uncommonColor = "#16a34a";
+    string private constant s_rareColor = "#2563eb";
+    string private constant s_epicColor = "#4f46e5";
+    string private constant s_legendaryColor = "#ea580c";
     // associated with chainlink function
     mapping(bytes32 => address) public s_requestIdToMemberAddress;
     bytes32 public s_lastRequestId;
@@ -140,14 +141,16 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
         uint256 tokenId
     ) public view returns (string memory) {
         address ownerAddr = ownerOf(tokenId);
-
+        uint256 memberBuildCount = s_memberToData[ownerAddr].buildCount;
         string memory color;
-        if (s_memberToData[ownerAddr].buildCount < 5) {
-            color = s_beginnerColor;
-        } else if (s_memberToData[ownerAddr].buildCount < 10) {
-            color = s_intermediateColor;
+        if (memberBuildCount < 5) {
+            color = s_uncommonColor;
+        } else if (memberBuildCount < 10) {
+            color = s_rareColor;
+        } else if (memberBuildCount < 15) {
+            color = s_epicColor;
         } else {
-            color = s_expertColor;
+            color = s_legendaryColor;
         }
         string memory svgTop = buildSvgTop(color);
         string memory svgBottom = buildSvgBottom(color, tokenId);
@@ -301,6 +304,49 @@ contract BuidlCountNft is ERC721, FunctionsClient, ConfirmedOwner {
         );
         _safeMint(msg.sender, s_tokenCounter);
         s_hasMinted[msg.sender] = true;
+        s_tokenCounter++;
+    }
+
+    /** @notice only contract owner can send request on behalf of another member
+     * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
+     * @param args the arguments to pass to the javascript source code
+     * @param ensName ens name resolved by frontend and passed in as an argument for updating the svg
+     */
+    function sendRequestOnBehalfOf(
+        uint64 subscriptionId,
+        string[] calldata args,
+        string memory ensName,
+        address memberAddr
+    ) external onlyOwner returns (bytes32 requestId) {
+        FunctionsRequest.Request memory req;
+        req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
+        if (args.length > 0) req.setArgs(args); // Set the arguments for the request
+        // Send the request and store the request ID
+        s_lastRequestId = _sendRequest(
+            req.encodeCBOR(),
+            subscriptionId,
+            s_gasLimit,
+            s_donID
+        );
+        s_requestIdToMemberAddress[s_lastRequestId] = memberAddr;
+        s_memberToData[memberAddr].ensName = ensName;
+        return s_lastRequestId;
+    }
+
+    /**
+     *
+     */
+    function minNftOnBehalfOf(address memberAddr) public {
+        require(
+            !s_hasMinted[memberAddr],
+            "This BuidlGuidl member has already minted an NFT"
+        );
+        require(
+            s_memberToData[memberAddr].buildCount > 0,
+            "Must ship at least one build to earn NFT"
+        );
+        _safeMint(memberAddr, s_tokenCounter);
+        s_hasMinted[memberAddr] = true;
         s_tokenCounter++;
     }
 

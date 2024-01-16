@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDarkMode } from "usehooks-ts";
 // import { useRouter } from "next/router";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, BugAntIcon, BuildingLibraryIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
@@ -17,9 +17,19 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
+    label: "Mint",
+    href: "/",
+    icon: <BuildingLibraryIcon className="h-5 w-5" />,
+  },
+  {
+    label: "Collection",
+    href: "/collection",
+    icon: <PhotoIcon className="h-5 w-5" />,
+  },
+  {
     label: "Debug Contracts",
     href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    icon: <BugAntIcon className="h-5 w-5" />,
   },
 ];
 
@@ -64,7 +74,7 @@ export const Header = () => {
 
   return (
     <div
-      className={`bg-base-300 sticky border-b border-primary lg:static top-0 navbar min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2`}
+      className={`bg-base-300 sticky border-b-2 border-primary lg:static top-0 navbar min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2`}
     >
       <div className="navbar-start w-auto lg:w-1/2">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
