@@ -36,7 +36,7 @@ import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0
  * @notice background color changes based on buildCount which is set by chainlink function
  * @notice MemberData.ensName sourced from frontend that queries mainnet ens registry
  */
-contract OnlyBuildorsNft is ERC721, FunctionsClient, ConfirmedOwner {
+contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     using FunctionsRequest for FunctionsRequest.Request;
 
     /*** Errors ***/
@@ -114,6 +114,17 @@ contract OnlyBuildorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     ) public view override returns (string memory) {
         require(tokenId < s_tokenCounter, "Token id does not exist.");
         string memory imageURI = svgToImageURI(tokenId);
+        string memory rarity;
+        uint256 memberBuildCount = s_memberToData[ownerOf(tokenId)].buildCount;
+        if (memberBuildCount < 5) {
+            rarity = "Uncommon";
+        } else if (memberBuildCount < 10) {
+            rarity = "Rare";
+        } else if (memberBuildCount < 15) {
+            rarity = "Epic";
+        } else {
+            rarity = "Legendary";
+        }
         return
             string(
                 abi.encodePacked(
@@ -123,7 +134,9 @@ contract OnlyBuildorsNft is ERC721, FunctionsClient, ConfirmedOwner {
                             abi.encodePacked(
                                 '{"name": "',
                                 name(),
-                                '", "description": "Dynamic SVG NFT that tracks BuidlGuidl member data", "attributes": [{"trait_type": "coolness", "value": "100"}], "image": "',
+                                '", "description": "Dynamic SVG NFT that tracks BuidlGuidl member data", "attributes": [{"trait_type": "rarity", "value": "',
+                                rarity,
+                                '"}], "image": "',
                                 imageURI,
                                 '"}'
                             )
@@ -293,7 +306,7 @@ contract OnlyBuildorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     /**
      *
      */
-    function minNft() public {
+    function mintNft() public {
         require(
             !s_hasMinted[msg.sender],
             "This BuidlGuidl member has already minted an NFT"
@@ -351,13 +364,41 @@ contract OnlyBuildorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     }
 
     // Getters
-    function getBuidlCount(address _memberAddr) public view returns (uint256) {
-        return s_memberToData[_memberAddr].buildCount;
+    function getBuidlCount(address memberAddr) public view returns (uint256) {
+        return s_memberToData[memberAddr].buildCount;
     }
 
     function getEnsName(
-        address _memberAddr
+        address memberAddr
     ) public view returns (string memory) {
-        return s_memberToData[_memberAddr].ensName;
+        return s_memberToData[memberAddr].ensName;
+    }
+
+    function getLatestTokenId() public view returns (uint256) {
+        return s_tokenCounter;
+    }
+
+    function getHasMinted(address memberAddr) public view returns (bool) {
+        return s_hasMinted[memberAddr];
+    }
+
+    function getLatestRequestId() public view returns (bytes32) {
+        return s_lastRequestId;
+    }
+
+    function getUncommonColor() public pure returns (string memory) {
+        return s_uncommonColor;
+    }
+
+    function getRareColor() public pure returns (string memory) {
+        return s_rareColor;
+    }
+
+    function getEpicColor() public pure returns (string memory) {
+        return s_epicColor;
+    }
+
+    function getLegendaryColor() public pure returns (string memory) {
+        return s_legendaryColor;
     }
 }

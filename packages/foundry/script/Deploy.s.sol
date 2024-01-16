@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./DeployHelpers.s.sol";
 import {Script, console} from "forge-std/Script.sol";
-import {OnlyBuildorsNft} from "../contracts/OnlyBuildorsNft.sol";
+import {OnlyBuidlorsNft} from "../contracts/OnlyBuidlorsNft.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 import {IFunctionsSubscriptions} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/interfaces/IFunctionsSubscriptions.sol";
 
@@ -33,7 +33,7 @@ contract DeployScript is ScaffoldETHDeploy {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        OnlyBuildorsNft onlyBuildorsNft = new OnlyBuildorsNft(
+        OnlyBuidlorsNft onlyBuildorsNft = new OnlyBuidlorsNft(
             router,
             donId,
             gasLimit

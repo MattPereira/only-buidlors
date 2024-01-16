@@ -2296,8 +2296,8 @@ const deployedContracts = {
     },
   },
   421614: {
-    BuidlCountNft: {
-      address: "0x8891F910D28523C03e3a0Bca336212446cB39B37",
+    OnlyBuidlorsNft: {
+      address: "0xC9548FFAf8641B2fD2083b8F964423Ce32327883",
       abi: [
         {
           type: "constructor",
@@ -2388,7 +2388,7 @@ const deployedContracts = {
           name: "getBuidlCount",
           inputs: [
             {
-              name: "_memberAddr",
+              name: "memberAddr",
               type: "address",
               internalType: "address",
             },
@@ -2407,7 +2407,7 @@ const deployedContracts = {
           name: "getEnsName",
           inputs: [
             {
-              name: "_memberAddr",
+              name: "memberAddr",
               type: "address",
               internalType: "address",
             },
@@ -2420,6 +2420,103 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getEpicColor",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "getHasMinted",
+          inputs: [
+            {
+              name: "memberAddr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getLatestRequestId",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getLatestTokenId",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getLegendaryColor",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "getRareColor",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "pure",
+        },
+        {
+          type: "function",
+          name: "getUncommonColor",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "pure",
         },
         {
           type: "function",
@@ -2470,7 +2567,20 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "minNft",
+          name: "minNftOnBehalfOf",
+          inputs: [
+            {
+              name: "memberAddr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "mintNft",
           inputs: [],
           outputs: [],
           stateMutability: "nonpayable",
@@ -2684,6 +2794,40 @@ const deployedContracts = {
               name: "ensName",
               type: "string",
               internalType: "string",
+            },
+          ],
+          outputs: [
+            {
+              name: "requestId",
+              type: "bytes32",
+              internalType: "bytes32",
+            },
+          ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "sendRequestOnBehalfOf",
+          inputs: [
+            {
+              name: "subscriptionId",
+              type: "uint64",
+              internalType: "uint64",
+            },
+            {
+              name: "args",
+              type: "string[]",
+              internalType: "string[]",
+            },
+            {
+              name: "ensName",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "memberAddr",
+              type: "address",
+              internalType: "address",
             },
           ],
           outputs: [
