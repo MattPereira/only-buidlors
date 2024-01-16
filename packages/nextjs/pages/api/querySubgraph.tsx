@@ -34,7 +34,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponseData | { message: string }>,
 ) {
-  const graphqlEndpoint = "https://subgraph.satsuma-prod.com/a4f5cc0f86e9/matts-team--3503850/basic-nft/api";
+  const graphqlEndpoint = "https://subgraph.satsuma-prod.com/a4f5cc0f86e9/matts-team--3503850/only-buidlors-nft/api";
 
   const graphqlQuery = {
     query: buildGraphQLQuery(),

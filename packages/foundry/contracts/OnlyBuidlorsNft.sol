@@ -81,10 +81,22 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         "return Functions.encodeUint256(buildCount);";
 
     /*** Events ***/
+    event RequestSent(
+        address indexed member,
+        string indexed argsZero,
+        bytes32 indexed requestId
+    );
+
     event Response(
         bytes32 indexed requestId,
         address indexed member,
         uint256 indexed buildCount
+    );
+
+    event Minted(
+        address indexed member,
+        uint256 indexed tokenId,
+        string tokenUri
     );
 
     /**
@@ -280,6 +292,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         );
         s_requestIdToMemberAddress[s_lastRequestId] = msg.sender;
         s_memberToData[msg.sender].ensName = ensName;
+        emit RequestSent(msg.sender, args[0], s_lastRequestId);
         return s_lastRequestId;
     }
 
@@ -317,6 +330,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         );
         _safeMint(msg.sender, s_tokenCounter);
         s_hasMinted[msg.sender] = true;
+        emit Minted(msg.sender, s_tokenCounter, tokenURI(s_tokenCounter));
         s_tokenCounter++;
     }
 

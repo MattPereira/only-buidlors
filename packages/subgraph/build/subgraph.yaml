@@ -1,0 +1,45 @@
+specVersion: 0.0.5
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: OnlyBuidlorsNft
+    network: sepolia
+    source:
+      address: "0x817F718A8e62D2E2Cc3034D1147643Ca375A5622"
+      abi: OnlyBuidlorsNft
+      startBlock: 5098535
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - OwnershipTransferRequested
+        - OwnershipTransferred
+        - RequestFulfilled
+        - RequestSent
+        - Response
+        - Transfer
+      abis:
+        - name: OnlyBuidlorsNft
+          file: OnlyBuidlorsNft/abis/OnlyBuidlorsNft.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: OwnershipTransferRequested(indexed address,indexed address)
+          handler: handleOwnershipTransferRequested
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: RequestFulfilled(indexed bytes32)
+          handler: handleRequestFulfilled
+        - event: RequestSent(indexed bytes32)
+          handler: handleRequestSent
+        - event: Response(indexed bytes32,indexed address,indexed uint256)
+          handler: handleResponse
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: OnlyBuidlorsNft/OnlyBuidlorsNft.wasm

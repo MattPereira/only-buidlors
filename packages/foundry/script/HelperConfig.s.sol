@@ -23,12 +23,27 @@ contract HelperConfig is Script {
             activeNetworkConfig = getArbitrumSepoliaConfig();
         } else if (block.chainid == 80001) {
             activeNetworkConfig = getMumbaiConfig();
+        } else if (block.chainid == 11155111) {
+            activeNetworkConfig = getEthereumSepoliaConfig();
+        } else {
+            revert("unsupported network");
         }
     }
 
-    /**
-     * Uses actual link token and vrf coordinator address on sepolia
-     */
+    function getEthereumSepoliaConfig()
+        public
+        pure
+        returns (NetworkConfig memory)
+    {
+        return
+            NetworkConfig({
+                router: 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0,
+                donId: 0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000,
+                subscriptionId: 1905,
+                gasLimit: 300000
+            });
+    }
+
     function getArbitrumSepoliaConfig()
         public
         pure

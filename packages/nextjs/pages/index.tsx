@@ -1,13 +1,18 @@
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
+import { CheckIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
+import { Button } from "~~/components/only-buildors/";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth/";
 
-const steps = [
+const INITIAL_STEPS_STATE = [
   {
     number: 1,
     text: <>Send a transaction to NFT contract to initiate a request to chainlink functions node</>,
+    completed: false,
   },
   {
     number: 2,
@@ -19,7 +24,7 @@ const steps = [
   },
 ];
 
-const SUBSCRIPTION_ID = 11n;
+const SUBSCRIPTION_ID = 1905n;
 
 /**
  * 1. display latest NFT that has been minted
@@ -28,25 +33,30 @@ const SUBSCRIPTION_ID = 11n;
  * 4. animation for waiting for chainlink functions node to respond
  * 5. button to mint nft
  * 6. animation for transaction mining
- * 7. display latest NFT that has been minted
- * 8. button to see the full collection
+ * 7. display the newly minted NFT in spot where button to mint was before
  */
 const Home: NextPage = () => {
+  const [imgSrc, setImgSrc] = useState<string>("/pixel-art.png");
+  const [steps, setSteps] = useState(INITIAL_STEPS_STATE);
   const { address } = useAccount();
 
   const {
     writeAsync: sendRequest,
-    // isLoading,
-    // isMining,
+    isLoading: requestTxIsLoading,
+    isMining: requestTxIsMining,
   } = useScaffoldContractWrite({
     contractName: "OnlyBuidlorsNft",
     functionName: "sendRequest",
     args: [SUBSCRIPTION_ID, [address || ""], "matthu.eth"],
     // blockConfirmations: 1,
-    // onBlockConfirmation: txnReceipt => {
-    //   console.log("Transaction blockHash", txnReceipt.blockHash);
-    // },
+    onBlockConfirmation: () => {
+      completeStep(1);
+    },
   });
+
+  const completeStep: any = (stepNumber: any) => {
+    setSteps(prevSteps => prevSteps.map(step => (step.number === stepNumber ? { ...step, completed: true } : step)));
+  };
 
   const {
     writeAsync: mintNft,
@@ -55,10 +65,9 @@ const Home: NextPage = () => {
   } = useScaffoldContractWrite({
     contractName: "OnlyBuidlorsNft",
     functionName: "mintNft",
-    // blockConfirmations: 1,
-    // onBlockConfirmation: txnReceipt => {
-    //   console.log("Transaction blockHash", txnReceipt.blockHash);
-    // },
+    onBlockConfirmation: () => {
+      completeStep(3);
+    },
   });
 
   const { data: hasMinted } = useScaffoldContractRead({
@@ -72,6 +81,23 @@ const Home: NextPage = () => {
     functionName: "getBuidlCount",
     args: [address || ""],
   });
+
+  useEffect(() => {
+    if (hasMinted) {
+      setImgSrc("/pixel-art.png");
+      completeStep(1);
+      completeStep(2);
+      completeStep(3);
+    } else if (buidlCount && buidlCount > 0n) {
+      completeStep(1);
+      completeStep(2);
+      setImgSrc("/step-3.jpg");
+    } else if (requestTxIsMining || requestTxIsLoading) {
+      setImgSrc("/step-1.jpg");
+    } else {
+      setImgSrc("/pixel-art.png");
+    }
+  }, [hasMinted, buidlCount, requestTxIsMining, requestTxIsLoading]);
 
   return (
     <>
@@ -88,7 +114,7 @@ const Home: NextPage = () => {
           </div>
           <div className="flex justify-center">
             <Image
-              src="/pixel-art.png"
+              src={imgSrc}
               width={10000}
               height={10000}
               alt="builders constructing a castle"
@@ -102,27 +128,26 @@ const Home: NextPage = () => {
               <div key={step.number} className="text-2xl flex gap-4 mb-5 items-center">
                 <div
                   style={{ minWidth: "40px" }}
-                  className="border-2 font-bold border-primary w-10 h-10 flex items-center justify-center rounded-full bg-primary text-primary-content"
+                  className={`${
+                    step.completed ? "bg-green-600" : "bg-primary"
+                  } font-bold w-10 h-10 flex items-center justify-center rounded-full text-primary-content`}
                 >
-                  {step.number}
+                  {step.completed ? <CheckIcon className="w-6 h-6 text-white" /> : step.number}
                 </div>
                 <div>{step.text}</div>
               </div>
             ))}
           </div>
+
           <div className="flex flex-col justify-center items-center">
             {hasMinted ? (
-              <button className="btn btn-primary btn-lg btn-outline px-10 text-2xl">See Collection</button>
+              <Link href="/collection">
+                <Button>View Collection</Button>
+              </Link>
             ) : buidlCount && buidlCount > 0n ? (
-              <button className="btn btn-primary btn-lg btn-outline px-10 text-2xl" onClick={() => mintNft()}>
-                Mint NFT
-              </button>
-            ) : hasMinted ? (
-              <button>See Collection</button>
+              <Button onClick={() => mintNft()}>Mint NFT</Button>
             ) : (
-              <button className="btn btn-primary btn-lg btn-outline px-10 text-2xl" onClick={() => sendRequest()}>
-                Send Request
-              </button>
+              <Button onClick={() => sendRequest()}>Send Request</Button>
             )}
           </div>
         </div>
