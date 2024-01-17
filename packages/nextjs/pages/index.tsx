@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { NextPage } from "next";
+import useSWR from "swr";
 import { useAccount } from "wagmi";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { Button } from "~~/components/only-buildors/";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth/";
+import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth/";
 
 const steps = [
   {
@@ -27,6 +28,9 @@ const steps = [
 
 const SUBSCRIPTION_ID = 1905n;
 
+// Define the fetcher function
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
 /**
  * 1. display latest NFT that has been minted
  * 2. button to send request to chainlink node
@@ -41,27 +45,6 @@ const SUBSCRIPTION_ID = 1905n;
 const Home: NextPage = () => {
   const [imgSrc, setImgSrc] = useState<string>("/pixel-art.png");
   const [stepsCompleted, setStepsCompleted] = useState(0);
-
-  useEffect(() => {
-    const fetchNftData = async () => {
-      try {
-        const response = await fetch("/api/get-nft-for-owner");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log(data.raw.tokenUri);
-        const decodedString = atob(data.raw.tokenUri);
-        const metadata = JSON.parse(decodedString);
-        console.log("metadata", metadata);
-        setImgSrc(metadata.image);
-      } catch (e) {
-        console.log("error", e);
-      }
-    };
-
-    fetchNftData();
-  }, []);
 
   const { address } = useAccount();
 
@@ -91,18 +74,45 @@ const Home: NextPage = () => {
     },
   });
 
+  const { data: buidlCount } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getBuidlCount",
+    args: [address || ""],
+  });
+
   const { data: hasMinted } = useScaffoldContractRead({
     contractName: "OnlyBuidlorsNft",
     functionName: "getHasMinted",
     args: [address || ""],
   });
 
-  const { data: buidlCount } = useScaffoldContractRead({
-    contractName: "OnlyBuidlorsNft",
-    functionName: "getBuidlCount",
-    args: [address || ""],
-  });
-  console.log("stepsCompleted", stepsCompleted);
+  const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
+
+  // only make the request if the eoa and contract address are defined AND the user has minted an NFT
+  const url =
+    address && onlyBuildorsNftContract?.address && hasMinted
+      ? `/api/get-nft-for-owner?eoaAddress=${address}&nftContract=${onlyBuildorsNftContract?.address}`
+      : null;
+
+  const { data: nftData, error: nftError } = useSWR(url, fetcher);
+
+  if (nftError) {
+    console.log("nftError", nftError);
+  }
+
+  // only change the image source if the nftData has been successfully fetched
+  useEffect(() => {
+    if (nftData) {
+      try {
+        const decodedString = atob(nftData.raw.tokenUri);
+        const metadata = JSON.parse(decodedString);
+        console.log("metadata", metadata);
+        setImgSrc(metadata.image);
+      } catch (e) {
+        console.log("error", e);
+      }
+    }
+  }, [nftData]);
 
   // Do I need a state variable in contract to track if member has completed SendRequest (step 1)?
   // How to track when chainlink node has responsed to the request?
