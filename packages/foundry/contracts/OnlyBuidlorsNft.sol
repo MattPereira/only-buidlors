@@ -81,7 +81,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         "return Functions.encodeUint256(buildCount);";
 
     /*** Events ***/
-    event RequestSent(
+    event Request(
         address indexed member,
         string indexed argsZero,
         bytes32 indexed requestId
@@ -292,7 +292,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         );
         s_requestIdToMemberAddress[s_lastRequestId] = msg.sender;
         s_memberToData[msg.sender].ensName = ensName;
-        emit RequestSent(msg.sender, args[0], s_lastRequestId);
+        emit Request(msg.sender, args[0], s_lastRequestId);
         return s_lastRequestId;
     }
 
@@ -322,11 +322,11 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     function mintNft() public {
         require(
             !s_hasMinted[msg.sender],
-            "This BuidlGuidl member has already minted an NFT"
+            "BuidlGuidl members are only allowed to mint one NFT"
         );
         require(
             s_memberToData[msg.sender].buildCount > 0,
-            "Must ship at least one build to earn NFT"
+            "You must ship at least one build to earn NFT"
         );
         _safeMint(msg.sender, s_tokenCounter);
         s_hasMinted[msg.sender] = true;

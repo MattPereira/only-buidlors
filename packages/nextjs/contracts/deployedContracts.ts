@@ -3015,6 +3015,31 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "Minted",
+          inputs: [
+            {
+              name: "member",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "tokenId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "tokenUri",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "OwnershipTransferRequested",
           inputs: [
             {
@@ -3047,6 +3072,31 @@ const deployedContracts = {
               type: "address",
               indexed: true,
               internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "Request",
+          inputs: [
+            {
+              name: "member",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "argsZero",
+              type: "string",
+              indexed: true,
+              internalType: "string",
+            },
+            {
+              name: "requestId",
+              type: "bytes32",
+              indexed: true,
+              internalType: "bytes32",
             },
           ],
           anonymous: false,
@@ -3301,7 +3351,7 @@ const deployedContracts = {
   },
   11155111: {
     OnlyBuidlorsNft: {
-      address: "0x817F718A8e62D2E2Cc3034D1147643Ca375A5622",
+      address: "0x55EE4357aEA84A6F82Bd1f499C4B0367e3D027A8",
       abi: [
         {
           type: "constructor",
@@ -4019,6 +4069,31 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "Minted",
+          inputs: [
+            {
+              name: "member",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "tokenId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "tokenUri",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "OwnershipTransferRequested",
           inputs: [
             {
@@ -4051,6 +4126,31 @@ const deployedContracts = {
               type: "address",
               indexed: true,
               internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "Request",
+          inputs: [
+            {
+              name: "member",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "argsZero",
+              type: "string",
+              indexed: true,
+              internalType: "string",
+            },
+            {
+              name: "requestId",
+              type: "bytes32",
+              indexed: true,
+              internalType: "bytes32",
             },
           ],
           anonymous: false,

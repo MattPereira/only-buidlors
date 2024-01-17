@@ -1,8 +1,10 @@
 import {
   Approval as ApprovalEvent,
   ApprovalForAll as ApprovalForAllEvent,
+  Minted as MintedEvent,
   OwnershipTransferRequested as OwnershipTransferRequestedEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
+  Request as RequestEvent,
   RequestFulfilled as RequestFulfilledEvent,
   RequestSent as RequestSentEvent,
   Response as ResponseEvent,
@@ -11,8 +13,10 @@ import {
 import {
   Approval,
   ApprovalForAll,
+  Minted,
   OwnershipTransferRequested,
   OwnershipTransferred,
+  Request,
   RequestFulfilled,
   RequestSent,
   Response,
@@ -49,6 +53,21 @@ export function handleApprovalForAll(event: ApprovalForAllEvent): void {
   entity.save()
 }
 
+export function handleMinted(event: MintedEvent): void {
+  let entity = new Minted(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.member = event.params.member
+  entity.tokenId = event.params.tokenId
+  entity.tokenUri = event.params.tokenUri
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
 export function handleOwnershipTransferRequested(
   event: OwnershipTransferRequestedEvent
 ): void {
@@ -73,6 +92,21 @@ export function handleOwnershipTransferred(
   )
   entity.from = event.params.from
   entity.to = event.params.to
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleRequest(event: RequestEvent): void {
+  let entity = new Request(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.member = event.params.member
+  entity.argsZero = event.params.argsZero
+  entity.requestId = event.params.requestId
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

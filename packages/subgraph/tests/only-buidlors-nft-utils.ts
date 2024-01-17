@@ -3,8 +3,10 @@ import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
   Approval,
   ApprovalForAll,
+  Minted,
   OwnershipTransferRequested,
   OwnershipTransferred,
+  Request,
   RequestFulfilled,
   RequestSent,
   Response,
@@ -58,6 +60,31 @@ export function createApprovalForAllEvent(
   return approvalForAllEvent
 }
 
+export function createMintedEvent(
+  member: Address,
+  tokenId: BigInt,
+  tokenUri: string
+): Minted {
+  let mintedEvent = changetype<Minted>(newMockEvent())
+
+  mintedEvent.parameters = new Array()
+
+  mintedEvent.parameters.push(
+    new ethereum.EventParam("member", ethereum.Value.fromAddress(member))
+  )
+  mintedEvent.parameters.push(
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  )
+  mintedEvent.parameters.push(
+    new ethereum.EventParam("tokenUri", ethereum.Value.fromString(tokenUri))
+  )
+
+  return mintedEvent
+}
+
 export function createOwnershipTransferRequestedEvent(
   from: Address,
   to: Address
@@ -96,6 +123,31 @@ export function createOwnershipTransferredEvent(
   )
 
   return ownershipTransferredEvent
+}
+
+export function createRequestEvent(
+  member: Address,
+  argsZero: string,
+  requestId: Bytes
+): Request {
+  let requestEvent = changetype<Request>(newMockEvent())
+
+  requestEvent.parameters = new Array()
+
+  requestEvent.parameters.push(
+    new ethereum.EventParam("member", ethereum.Value.fromAddress(member))
+  )
+  requestEvent.parameters.push(
+    new ethereum.EventParam("argsZero", ethereum.Value.fromString(argsZero))
+  )
+  requestEvent.parameters.push(
+    new ethereum.EventParam(
+      "requestId",
+      ethereum.Value.fromFixedBytes(requestId)
+    )
+  )
+
+  return requestEvent
 }
 
 export function createRequestFulfilledEvent(id: Bytes): RequestFulfilled {
