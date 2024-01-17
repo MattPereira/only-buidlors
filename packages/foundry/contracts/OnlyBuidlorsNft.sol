@@ -93,11 +93,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         uint256 indexed buildCount
     );
 
-    event Minted(
-        address indexed member,
-        uint256 indexed tokenId,
-        string tokenUri
-    );
+    event Minted(address indexed member, uint256 indexed tokenId);
 
     /**
      * @param router address of chainlink router
@@ -111,7 +107,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     )
         FunctionsClient(router)
         ConfirmedOwner(msg.sender)
-        ERC721("Buidl Counter", "BDLC")
+        ERC721("Only Buidlors", "OBDL")
     {
         s_tokenCounter = 0; // first NFT minted has tokenId of 0
         s_donID = donId;
@@ -330,11 +326,12 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         );
         _safeMint(msg.sender, s_tokenCounter);
         s_hasMinted[msg.sender] = true;
-        emit Minted(msg.sender, s_tokenCounter, tokenURI(s_tokenCounter));
+        emit Minted(msg.sender, s_tokenCounter);
         s_tokenCounter++;
     }
 
-    /** @notice only contract owner can send request on behalf of another member
+    /**
+     * @notice only contract owner can send request on behalf of another member
      * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
      * @param args the arguments to pass to the javascript source code
      * @param ensName ens name resolved by frontend and passed in as an argument for updating the svg
@@ -361,9 +358,9 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     }
 
     /**
-     *
+     * @notice only owner of contract can mint NFT on behalf of another member
      */
-    function minNftOnBehalfOf(address memberAddr) public {
+    function minNftOnBehalfOf(address memberAddr) public onlyOwner {
         require(
             !s_hasMinted[memberAddr],
             "This BuidlGuidl member has already minted an NFT"

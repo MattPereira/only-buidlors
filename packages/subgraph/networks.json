@@ -1,8 +1,0 @@
-{
-  "sepolia": {
-    "OnlyBuidlorsNft": {
-      "address": "0x55EE4357aEA84A6F82Bd1f499C4B0367e3D027A8",
-      "startBlock": 5099089
-    }
-  }
-}

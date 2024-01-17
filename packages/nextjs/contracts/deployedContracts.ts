@@ -3029,12 +3029,6 @@ const deployedContracts = {
               indexed: true,
               internalType: "uint256",
             },
-            {
-              name: "tokenUri",
-              type: "string",
-              indexed: false,
-              internalType: "string",
-            },
           ],
           anonymous: false,
         },
@@ -3351,7 +3345,7 @@ const deployedContracts = {
   },
   11155111: {
     OnlyBuidlorsNft: {
-      address: "0x55EE4357aEA84A6F82Bd1f499C4B0367e3D027A8",
+      address: "0x6a7415A8d287b343417150E7a74069D6D121372d",
       abi: [
         {
           type: "constructor",
@@ -4082,12 +4076,6 @@ const deployedContracts = {
               type: "uint256",
               indexed: true,
               internalType: "uint256",
-            },
-            {
-              name: "tokenUri",
-              type: "string",
-              indexed: false,
-              internalType: "string",
             },
           ],
           anonymous: false,
