@@ -32,7 +32,8 @@ const steps = [
 ];
 
 // Define the subscription ID for the Chainlink functions (specific to each network)
-const SUBSCRIPTION_ID = 1905n;
+// const SUBSCRIPTION_ID = 1905n; // eth-sepolia
+const SUBSCRIPTION_ID = 11n; // arb-sepolia
 
 // Define the fetcher function for SWR
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -160,11 +161,11 @@ const Home: NextPage = () => {
       <section className="p-5 md:p-10 lg:px-16 2xl:p-24 grow flex flex-col">
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
           <div>
-            <div className="flex justify-center lg:justify-start">
-              <div className="mr-5">
-                <BuidlGuidlIcon width={200} height={250} alt="github icon" />
+            <div className="flex justify-center lg:justify-start mb-">
+              <div className="mr-5 w-[120px] h-[120px] lg:w-[200px] lg:h-[300px]">
+                <BuidlGuidlIcon alt="github icon" />
               </div>
-              <div className="mt-20">
+              <div className="mt-5 lg:mt-20">
                 <h1 className="text-6xl md:text-7xl lg:text-8xl font-lucky">
                   <div>ONLY</div> BUIDLORS
                 </h1>
