@@ -5,9 +5,9 @@ import { useDarkMode } from "usehooks-ts";
 // import { useRouter } from "next/router";
 import { Bars3Icon, BugAntIcon, BuildingLibraryIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { SwitchTheme } from "~~/components/SwitchTheme";
-import { BuidlGuidlLogo } from "~~/components/only-buildors";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
+import BuidlGuidlIcon from "~~/public/bg-logo.svg";
 
 type HeaderMenuLink = {
   label: string;
@@ -74,7 +74,7 @@ export const Header = () => {
 
   return (
     <div
-      className={`bg-base-300 sticky border-b-2 border-primary lg:static top-0 navbar min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2`}
+      className={`bg-base-300 sticky border-b border-primary lg:static top-0 navbar min-h-0 flex-shrink-0 justify-between z-20 px-0 sm:px-2`}
     >
       <div className="navbar-start w-auto lg:w-1/2">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
@@ -100,8 +100,8 @@ export const Header = () => {
           )}
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-1 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10 primary">
-            <BuidlGuidlLogo />
+          <div>
+            <BuidlGuidlIcon width={35} height={35} alt="github icon" />
           </div>
           <div className="font-lucky text-3xl mt-4">ONLY BUIDLORS</div>
         </Link>

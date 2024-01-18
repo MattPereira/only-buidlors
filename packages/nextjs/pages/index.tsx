@@ -178,7 +178,7 @@ const Home: NextPage = () => {
             </div>
           </div>
 
-          <div className="pt-20">
+          <div className="pt-20 pb-10">
             {isBuilder ? (
               <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-center">
                 <div>

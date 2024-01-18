@@ -58,9 +58,11 @@ const Collection: NextPage = () => {
             <h1 className="text-5xl md:text-6xl lg:text-8xl font-lucky">
               <div>THE</div> COLLECTION
             </h1>
-            <div className="text-xl lg:text-2xl xl:text-3xl">See all NFTs that have been minted by the buidlors.</div>
+            <div className="text-xl lg:text-2xl xl:text-3xl">See all NFTs that have been minted by the buidlors</div>
           </div>
-          <RarityTable />
+          <div className="flex justify-center">
+            <RarityTable />
+          </div>
         </div>
 
         <div className="my-14">

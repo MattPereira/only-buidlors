@@ -1,6 +1,6 @@
 export const RarityTable = () => {
   return (
-    <div className="bg-primary rounded-xl sm:p-4">
+    <div className="bg-primary rounded-xl sm:p-4 w-full max-w-[800px]">
       <div className="overflow-x-auto">
         <table className="table text-primary-content">
           <thead>
