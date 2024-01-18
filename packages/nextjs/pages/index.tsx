@@ -6,7 +6,6 @@ import useSWR from "swr";
 import { useAccount } from "wagmi";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
-// import { BuidlGuidlLogo } from "~~/components/only-buildors";
 import { Button } from "~~/components/only-buildors/";
 import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth/";
 
@@ -14,12 +13,15 @@ import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWr
 const steps = [
   {
     number: 1,
-    text: <>Send a transaction to NFT contract to initiate a request to chainlink functions node</>,
+    text: <>Send a transaction to on chain NFT contract to send a request to chainlink functions node</>,
   },
   {
     number: 2,
     text: (
-      <>Wait for chainlink node to execute off chain API call to BuidlGuidl server and respond to the NFT contract</>
+      <>
+        Wait for chainlink node to execute off chain API call to BuidlGuidl server and relay the response to the NFT
+        contract
+      </>
     ),
   },
   {
@@ -28,7 +30,7 @@ const steps = [
   },
 ];
 
-// Define the subscription ID for the Chainlink functions
+// Define the subscription ID for the Chainlink functions (specific to each network)
 const SUBSCRIPTION_ID = 1905n;
 
 // Define the fetcher function for SWR
@@ -155,90 +157,89 @@ const Home: NextPage = () => {
   return (
     <>
       <MetaHeader />
-      {/* <section className="grow flex flex-col"> */}
-      <section className="">
-        <div className="p-5 md:p-10 lg:px-16 2xl:p-24">
-          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
+      <section className="p-5 md:p-10 lg:px-16 2xl:p-24 grow flex flex-col">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
+          <div className="flex justify-center lg:justify-start">
             <div>
-              <h1 className="text-5xl md:text-6xl lg:text-8xl font-lucky">
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-lucky">
                 <div>ONLY</div> BUIDLORS
               </h1>
-              <div className="text-xl lg:text-2xl xl:text-3xl">
+              <div className="text-xl sm:text-2xl xl:text-3xl">
                 A dynamic SVG NFT collection for BuidlGuidl members only.
               </div>
             </div>
-            <div className="flex justify-center">
-              <Image
-                src={imgSrc}
-                width={800}
-                height={700}
-                alt="dynamic image of minting proccess and final NFT"
-                className="rounded-xl"
-              />
-            </div>
           </div>
+          <div className="flex justify-center">
+            <Image
+              src={imgSrc}
+              width={800}
+              height={700}
+              alt="dynamic image of minting proccess and final NFT"
+              className="rounded-xl"
+            />
+          </div>
+        </div>
 
-          <div className="pt-20 pb-10">
-            {isBuilder ? (
-              <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-center">
-                <div>
-                  {steps.map(step => (
-                    <div key={step.number} className="text-2xl flex gap-4 mb-5 items-start">
-                      <div
-                        style={{ minWidth: "40px" }}
-                        className={`${
-                          stepsCompleted >= step.number ? "bg-green-600" : "bg-primary"
-                        } font-bold w-10 h-10 flex items-center justify-center rounded-full text-primary-content`}
-                      >
-                        {stepsCompleted >= step.number ? <CheckIcon className="w-6 h-6 text-white" /> : step.number}
-                      </div>
-                      <div>{step.text}</div>
+        <div className="grow flex flex-col items-center justify-center py-10">
+          {isBuilder ? (
+            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-20 items-center">
+              <div>
+                {steps.map(step => (
+                  <div key={step.number} className="text-2xl flex gap-4 mb-8 items-start">
+                    <div
+                      style={{ minWidth: "40px" }}
+                      className={`${
+                        stepsCompleted >= step.number ? "bg-green-600" : "bg-primary"
+                      } font-bold w-10 h-10 flex items-center justify-center rounded-full text-primary-content`}
+                    >
+                      {stepsCompleted >= step.number ? <CheckIcon className="w-6 h-6 text-white" /> : step.number}
                     </div>
-                  ))}
-                </div>
+                    <div>{step.text}</div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="flex flex-col justify-center items-center">
-                  {hasMinted ? (
-                    <Link href="/collection">
-                      <Button>View Collection</Button>
-                    </Link>
-                  ) : buidlCount && buidlCount > 0n ? (
-                    <Button onClick={() => mintNft()}>Mint NFT</Button>
-                  ) : (
-                    <Button onClick={() => sendRequest()} disabled={stepsCompleted >= 1}>
-                      {stepsCompleted >= 1 ? "Request proccessing..." : "Send Request"}
-                    </Button>
-                  )}
-                </div>
+              <div className="flex flex-col justify-center items-center">
+                {hasMinted ? (
+                  <Link href="/collection">
+                    <Button>View Collection</Button>
+                  </Link>
+                ) : buidlCount && buidlCount > 0n ? (
+                  <Button onClick={() => mintNft()}>Mint NFT</Button>
+                ) : (
+                  <Button onClick={() => sendRequest()} disabled={stepsCompleted >= 1}>
+                    {stepsCompleted >= 1 ? "Request proccessing..." : "Send Request"}
+                  </Button>
+                )}
               </div>
-            ) : (
-              <div className="text-xl lg:text-2xl xl:text-3xl text-center">
-                <div className="mb-10">
-                  Please connect the wallet associated with your{" "}
-                  <a
-                    className="underline text-accent"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://app.buidlguidl.com/builders/0x41f727fA294E50400aC27317832A9F78659476B9"
-                  >
-                    BuidlGuidl profile
-                  </a>{" "}
-                  in order to mint an NFT
-                </div>
-                <div>
-                  If you are not a member yet, join us by the completing challenges at{" "}
-                  <a
-                    className="underline text-accent"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://speedrunethereum.com/"
-                  >
-                    Speedrun Ethereum
-                  </a>
-                </div>
+            </div>
+          ) : (
+            <div className="text-xl sm:text-2xl xl:text-3xl text-center">
+              <div className="mb-10">
+                Connect the wallet associated with your{" "}
+                <a
+                  className="underline text-accent"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://app.buidlguidl.com/builders/0x41f727fA294E50400aC27317832A9F78659476B9"
+                >
+                  BuidlGuidl profile
+                </a>{" "}
+                to mint an NFT
               </div>
-            )}
-          </div>
+              <div>
+                If you are not a member yet, join us by the completing challenges at{" "}
+                <a
+                  className="underline text-accent"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://speedrunethereum.com/"
+                >
+                  Speedrun Ethereum
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>

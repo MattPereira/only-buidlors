@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 // import Image from "next/image";
 import Link from "next/link";
-import { useDarkMode } from "usehooks-ts";
 // import { useRouter } from "next/router";
 import { Bars3Icon, BugAntIcon, BuildingLibraryIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { SwitchTheme } from "~~/components/SwitchTheme";
@@ -62,15 +61,12 @@ export const HeaderMenuLinks = () => {
  * Site header
  */
 export const Header = () => {
-  const { isDarkMode } = useDarkMode();
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const burgerMenuRef = useRef<HTMLDivElement>(null);
   useOutsideClick(
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
   );
-  console.log("isDarkMode", isDarkMode);
 
   return (
     <div

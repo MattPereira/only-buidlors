@@ -1,28 +1,32 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { NextPage } from "next";
+import useSWR from "swr";
 import { RarityTable } from "~~/components/only-buildors/";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth/";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth/";
+
+// Define the fetcher function for SWR
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 const Collection: NextPage = () => {
-  const [bgNft, setBgNft] = useState<any>(null);
   const [nfts, setNfts] = useState<any>([]);
 
-  const { data: base64encodedTokenUri } = useScaffoldContractRead({
-    contractName: "OnlyBuidlorsNft",
-    functionName: "tokenURI",
-    args: [0n],
-  });
+  const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
+
+  const getNftsForContractUrl = onlyBuildorsNftContract?.address
+    ? `/api/get-nfts-for-contract?contractAddress=${onlyBuildorsNftContract?.address}`
+    : null;
+
+  const { data: nftsData, error: nftsError } = useSWR(getNftsForContractUrl, fetcher);
+
+  if (nftsError) {
+    console.log("nftsError", nftsError);
+  }
 
   useEffect(() => {
-    const fetchNftData = async () => {
+    if (nftsData) {
       try {
-        const response = await fetch("/api/get-nfts-for-contract");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        const decodedNfts = data.map((nft: any) => {
+        const decodedNfts = nftsData.map((nft: any) => {
           const utf8String = Buffer.from(nft.raw.tokenUri, "base64").toString("utf-8");
           return JSON.parse(utf8String);
         });
@@ -30,26 +34,9 @@ const Collection: NextPage = () => {
       } catch (e) {
         console.log("error", e);
       }
-    };
+    }
+  }, [nftsData]);
 
-    fetchNftData();
-  }, []);
-
-  console.log("nfts", nfts);
-
-  useEffect(() => {
-    if (!base64encodedTokenUri) return;
-    // Decode the Base64 string
-    const decodedString = atob(base64encodedTokenUri);
-
-    // Parse the JSON metadata
-    const metadata = JSON.parse(decodedString);
-
-    // Set the NFT data
-    setBgNft(metadata);
-  }, [base64encodedTokenUri]);
-
-  console.log(bgNft);
   return (
     <>
       <section className="p-5 md:p-10 xl:p-14">

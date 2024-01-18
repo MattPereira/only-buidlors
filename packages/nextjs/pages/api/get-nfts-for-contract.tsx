@@ -1,27 +1,34 @@
+import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // Base URL
-    const url = `https://eth-sepolia.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getNFTsForContract?contractAddress=0x6a7415A8d287b343417150E7a74069D6D121372d&withMetadata=true`;
+    const { contractAddress } = req.query;
 
-    // Fetch data
-    const response = await fetch(url);
-
-    // Check if the response was successful
-    if (!response.ok) {
-      throw new Error(`API responded with status code ${response.status}`);
+    // Check if contractAddress is provided
+    if (!contractAddress) {
+      return res.status(400).json({ error: "Contract address is required" });
     }
 
-    const data = await response.json();
-    const nftsArray = data.nfts;
+    // Fetch data using axios
+    const response = await axios.get(
+      `https://eth-sepolia.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getNFTsForContract`,
+      {
+        params: {
+          contractAddress,
+          withMetadata: true,
+        },
+      },
+    );
+
+    // Extract data from response
+    const nftsArray = response.data.nfts;
 
     res.status(200).json(nftsArray);
   } catch (error) {
-    // Log the error for server-side debugging
     console.error("Failed to fetch NFT data for contract", error);
 
-    // Send a generic error response to the client
+    // Send a response with the error message
     res.status(500).json({ error: "Failed to fetch NFT data for contract" });
   }
 }

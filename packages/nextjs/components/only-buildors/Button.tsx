@@ -1,3 +1,5 @@
+import { useDarkMode } from "usehooks-ts";
+
 type ButtonProps = {
   onClick?: () => void; // Make onClick optional
   children: React.ReactNode; // children can be any JSX element
@@ -8,6 +10,8 @@ type ButtonProps = {
  * https://devdojo.com/tailwindcss/buttons
  */
 export const Button = ({ onClick, children, disabled }: ButtonProps) => {
+  const { isDarkMode } = useDarkMode();
+
   return (
     <button
       disabled={disabled}
@@ -19,7 +23,7 @@ export const Button = ({ onClick, children, disabled }: ButtonProps) => {
       <span className="absolute inset-0 w-full h-full transition-all duration-200 ease-in-out delay-100 bg-accent rounded-full opacity-0 group-hover:opacity-100 "></span>
       <span
         className={`${
-          disabled ? "text-neutral-500" : "text-accent"
+          disabled ? "text-neutral-500" : isDarkMode ? "text-accent" : "text-white"
         } relative  transition-colors duration-200 ease-in-out delay-100 group-hover:text-white`}
       >
         {children}
