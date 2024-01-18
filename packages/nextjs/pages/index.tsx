@@ -109,9 +109,8 @@ const Home: NextPage = () => {
   useEffect(() => {
     if (nftData) {
       try {
-        const decodedString = atob(nftData.raw.tokenUri);
+        const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
         const metadata = JSON.parse(decodedString);
-        console.log("metadata", metadata);
         setImgSrc(metadata.image);
       } catch (e) {
         console.log("error", e);
