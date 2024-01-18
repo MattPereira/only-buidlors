@@ -48,7 +48,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
  * @TODO resolve ens name using mainnet contract and plug into sendRequest writeAsync method
  */
 const Home: NextPage = () => {
-  const [imgSrc, setImgSrc] = useState<string>("/pixel-art.png");
+  const [imgSrc, setImgSrc] = useState<string>("/pixel-art.jpg");
   const [stepsCompleted, setStepsCompleted] = useState(0);
 
   const { address } = useAccount();
@@ -82,13 +82,13 @@ const Home: NextPage = () => {
   const { data: buidlCount } = useScaffoldContractRead({
     contractName: "OnlyBuidlorsNft",
     functionName: "getBuidlCount",
-    args: [address || ""],
+    args: [address || "0x000"],
   });
 
   const { data: hasMinted } = useScaffoldContractRead({
     contractName: "OnlyBuidlorsNft",
     functionName: "getHasMinted",
-    args: [address || ""],
+    args: [address || "0x000"],
   });
 
   const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
@@ -122,7 +122,7 @@ const Home: NextPage = () => {
   // How to track when chainlink node has responsed to the request?
   useEffect(() => {
     if (hasMinted) {
-      setImgSrc("/pixel-art.png"); // CHANGE TO SHOWING THE NFT IMAGE
+      setImgSrc("/pixel-art.jpg"); // CHANGE TO SHOWING THE NFT IMAGE
       setStepsCompleted(3);
     } else if (buidlCount && buidlCount > 0n) {
       setImgSrc("/step-3.jpg");
@@ -132,7 +132,7 @@ const Home: NextPage = () => {
     } else if (requestTxIsMining || requestTxIsLoading) {
       setImgSrc("/step-1.jpg");
     } else {
-      setImgSrc("/pixel-art.png");
+      setImgSrc("/pixel-art.jpg");
     }
   }, [hasMinted, buidlCount, requestTxIsMining, requestTxIsLoading, stepsCompleted]);
 
