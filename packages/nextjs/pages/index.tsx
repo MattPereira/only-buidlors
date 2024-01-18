@@ -14,7 +14,9 @@ import BuidlGuidlIcon from "~~/public/bg-logo.svg";
 const steps = [
   {
     number: 1,
-    text: <>Send a transaction to NFT contract to send a request to chainlink functions node</>,
+    text: (
+      <>Send a transaction to the NFT contract that emits an event which chainlink function nodes are listening for</>
+    ),
   },
   {
     number: 2,
@@ -27,7 +29,7 @@ const steps = [
   },
   {
     number: 3,
-    text: <>Send a second transaction to NFT contract to mint a members only NFT</>,
+    text: <>Send a second transaction to the NFT contract to mint your OnlyBuidlors NFT</>,
   },
 ];
 
@@ -189,9 +191,7 @@ const Home: NextPage = () => {
               </div>
             </div>
 
-            <div className="text-xl sm:text-2xl xl:text-3xl">
-              A dynamic SVG NFT collection for BuidlGuidl members only.
-            </div>
+            <div className="text-xl sm:text-2xl xl:text-3xl">A dynamic SVG NFT collection for the BuidlGuidl</div>
           </div>
 
           <div className="flex justify-center">
