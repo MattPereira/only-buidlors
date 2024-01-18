@@ -1,3 +1,7 @@
+# Only Buidlors
+A dynamic SVG NFT project that uses chainlink functions to fetch off chain data from the BuidlGuidl API. All BuidlGuidl members with at least 1 published build are welcome to mint an NFT with a dynamic background color that changes based on the number of builds submitted!
+
+
 # TODO
 
 1. Impliment chainlink function to fetch build count from BG api
@@ -8,6 +12,7 @@
    2. 5 - 9 builds gets silver
    3. 10+ builds gets rainbow or gold
 5. Figure out if account abstraction is possible for the minting to pay users mint fees
+6. Set up Chainlink automation to mint NFT by listening for event of chainlink function Response
 
 ## Resources
 
