@@ -31,7 +31,7 @@ contract SendRequestsScript is ScaffoldETHDeploy {
         vm.startBroadcast(deployerPrivateKey);
 
         OnlyBuidlorsNft onlyBuildorsNft = OnlyBuidlorsNft(
-            0x822736A04Df5323BC55A45368dd0a6e09F7ECDe9
+            0x0B7F4cb1dab4a9bcaBb6B8684D1BdC9712E7f9EA
         );
 
         string[] memory args = new string[](1);
