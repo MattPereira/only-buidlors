@@ -12,18 +12,22 @@ export const SwitchTheme = ({ className }: { className?: string }) => {
   }, [isDarkMode]);
 
   return (
-    <div className={`flex space-x-2 text-sm ${className}`}>
-      <input
+    <div className={`flex ml-3 ${className}`}>
+      {/* <input
         id="theme-toggle"
         type="checkbox"
-        className="toggle toggle-primary bg-primary hover:bg-primary border-primary"
+        className="toggle toggle-primary bg-primary"
         onChange={toggle}
         checked={isDarkMode}
-      />
+      /> */}
       {isMounted() && (
-        <label htmlFor="theme-toggle" className={`swap swap-rotate ${!isDarkMode ? "swap-active" : ""}`}>
-          <SunIcon className="swap-on h-5 w-5" />
-          <MoonIcon className="swap-off h-5 w-5" />
+        <label
+          onClick={toggle}
+          htmlFor="theme-toggle"
+          className={`swap swap-rotate ${!isDarkMode ? "swap-active" : ""}`}
+        >
+          <SunIcon className="swap-on h-7 w-7" />
+          <MoonIcon className="swap-off h-7 w-7" />
         </label>
       )}
     </div>

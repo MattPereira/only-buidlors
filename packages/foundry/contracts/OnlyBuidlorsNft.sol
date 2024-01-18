@@ -194,8 +194,8 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         return
             string(
                 abi.encodePacked(
-                    '<svg width="500" height="375" viewBox="0 0 500 375" font-family="Verdana, Sans" xmlns="http://www.w3.org/2000/svg">',
-                    '<rect width="500" height="375" fill="',
+                    '<svg width="500" height="333" viewBox="0 0 500 333" font-family="Verdana, Sans" xmlns="http://www.w3.org/2000/svg">',
+                    '<rect width="500" height="333" fill="',
                     backgroundColor,
                     '"/>',
                     '<g transform="translate(20, 27) scale(1.15)">',
@@ -203,7 +203,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
                     '<path d="M28.7643 2.18495V32.263H34.0339V18.7778C34.0339 18.7778 35.3804 16.0081 40.2893 17.2299C46.7851 18.8468 54.7881 17.7511 59.9257 8.45259C44.3573 13.5802 43.9403 -4.04034 28.7643 2.18495Z" fill="white"/>',
                     "</g>"
                     '<text fill="white" x="97" y="115" font-size="77">BuidlGuidl</text>',
-                    '<rect fill="white" x="0" y="160" width="500" height="60"/>'
+                    '<rect fill="white" x="0" y="150" width="500" height="60"/>'
                 )
             );
     }
@@ -230,7 +230,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
                 abi.encodePacked(
                     '<text fill="',
                     textColor,
-                    '" x="250" y="197" font-size="18" text-anchor="middle">',
+                    '" x="250" y="188" font-size="18" text-anchor="middle">',
                     addressString,
                     "</text>"
                 )
@@ -240,7 +240,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
                 abi.encodePacked(
                     '<text fill="',
                     textColor,
-                    '" x="250" y="205" font-size="45" text-anchor="middle">',
+                    '" x="250" y="195" font-size="45" text-anchor="middle">',
                     ensName,
                     "</text>"
                 )
@@ -254,13 +254,13 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
             string(
                 abi.encodePacked(
                     identity,
-                    '<circle fill="white" cx="440" cy="300" r="38" />',
-                    '<text  x="440" y="300" font-size="40" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="',
+                    '<circle fill="white" cx="440" cy="275" r="38" />',
+                    '<text  x="440" y="275" font-size="40" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="',
                     textColor,
                     '">',
                     buildCountString,
                     "</text>",
-                    '<text fill="white" x="25" y="315" font-size="43" font-weight="bold">Builds Shipped</text>',
+                    '<text fill="white" x="25" y="290" font-size="43" font-weight="bold">Builds Shipped</text>',
                     "</svg>"
                 )
             );

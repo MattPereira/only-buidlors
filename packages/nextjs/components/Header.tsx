@@ -1,13 +1,13 @@
 import React, { useCallback, useRef, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import { useDarkMode } from "usehooks-ts";
 // import { useRouter } from "next/router";
 import { Bars3Icon, BugAntIcon, BuildingLibraryIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import { SwitchTheme } from "~~/components/SwitchTheme";
+import { BuidlGuidlLogo } from "~~/components/only-buildors";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
-
-// import BuidlGuidlLogo from "~~/public/logo.svg";
 
 type HeaderMenuLink = {
   label: string;
@@ -99,11 +99,11 @@ export const Header = () => {
             </ul>
           )}
         </div>
-        <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
-            <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
+        <Link href="/" passHref className="hidden lg:flex items-center gap-1 ml-4 mr-6 shrink-0">
+          <div className="flex relative w-10 h-10 primary">
+            <BuidlGuidlLogo />
           </div>
-          <div className="font-lucky text-3xl mt-3">ONLY BUIDLORS</div>
+          <div className="font-lucky text-3xl mt-4">ONLY BUIDLORS</div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
           <HeaderMenuLinks />
@@ -112,6 +112,7 @@ export const Header = () => {
       <div className="navbar-end flex-grow mr-4">
         <RainbowKitCustomConnectButton />
         <FaucetButton />
+        <SwitchTheme />
       </div>
     </div>
   );

@@ -1,20 +1,20 @@
 export const RarityTable = () => {
   return (
-    <div className="bg-base-200 rounded-xl sm:px-8 sm:py-4">
+    <div className="bg-primary rounded-xl sm:p-4">
       <div className="overflow-x-auto">
-        <table className="table">
+        <table className="table text-primary-content">
           <thead>
-            <tr className="text-xl">
-              <th className="border-b border-primary"># of Buidls</th>
-              <th className="border-b border-primary">Rarity</th>
-              <th className="border-b border-primary">Color</th>
+            <tr className="text-xl text-primary-content">
+              <th>Build Count</th>
+              <th>Rarity</th>
+              <th>Color</th>
             </tr>
           </thead>
           <tbody className="text-xl">
             <tr>
-              <td className="border-b border-primary">1 to 4</td>
-              <td className="border-b border-primary">Uncommon</td>
-              <td className="border-b border-primary">
+              <td className="border-b border-primary pt-5">1 to 4</td>
+              <td className="border-b border-primary pt-5">Uncommon</td>
+              <td className="border-b border-primary pt-5">
                 <div className="bg-green-600 text-green-600 rounded-lg">green</div>
               </td>
             </tr>
