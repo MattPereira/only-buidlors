@@ -8,12 +8,13 @@ import { CheckIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { Button } from "~~/components/only-buildors/";
 import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth/";
+import BuidlGuidlIcon from "~~/public/bg-logo.svg";
 
 // Define the steps for the minting process outside component to save resources
 const steps = [
   {
     number: 1,
-    text: <>Send a transaction to on chain NFT contract to send a request to chainlink functions node</>,
+    text: <>Send a transaction to NFT contract to send a request to chainlink functions node</>,
   },
   {
     number: 2,
@@ -158,16 +159,23 @@ const Home: NextPage = () => {
       <MetaHeader />
       <section className="p-5 md:p-10 lg:px-16 2xl:p-24 grow flex flex-col">
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
-          <div className="flex justify-center lg:justify-start">
-            <div>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-lucky">
-                <div>ONLY</div> BUIDLORS
-              </h1>
-              <div className="text-xl sm:text-2xl xl:text-3xl">
-                A dynamic SVG NFT collection for BuidlGuidl members only.
+          <div>
+            <div className="flex justify-center lg:justify-start">
+              <div className="mr-5">
+                <BuidlGuidlIcon width={200} height={250} alt="github icon" />
+              </div>
+              <div className="mt-20">
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-lucky">
+                  <div>ONLY</div> BUIDLORS
+                </h1>
               </div>
             </div>
+
+            <div className="text-xl sm:text-2xl xl:text-3xl">
+              A dynamic SVG NFT collection for BuidlGuidl members only.
+            </div>
           </div>
+
           <div className="flex justify-center">
             <Image
               src={imgSrc}
