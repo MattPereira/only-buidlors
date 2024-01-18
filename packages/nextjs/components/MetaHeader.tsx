@@ -15,7 +15,7 @@ const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT
 
 export const MetaHeader = ({
   title = "Only Buidlors",
-  description = "An NFT collection for BuidlGuidl members that have shipped at least one build",
+  description = "A dynamic SVG NFT collection for the BuidlGuidl",
   image = "thumbnail.jpg",
   twitterCard = "summary_large_image",
   children,

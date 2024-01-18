@@ -55,6 +55,66 @@ const Home: NextPage = () => {
 
   const { address } = useAccount();
 
+  /*** Read Contract ***/
+  const { data: buidlCount } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getBuidlCount",
+    args: [address || "0x000"],
+  });
+
+  const { data: hasMinted } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getHasMinted",
+    args: [address || "0x000"],
+  });
+
+  /*** API requests ***/
+
+  // BuidlGuidl API Request
+  // only make the request if the eoa and contract address are defined AND the user has minted an NFT
+  const bgBuildersUrl = address ? `https://buidlguidl-v3.appspot.com/builders/${address}` : null;
+
+  const { data: isBuilder, error: isBuilderError } = useSWR(bgBuildersUrl, fetcher, {
+    shouldRetryOnError: false, // Do not retry on error
+    onError: error => {
+      if (error.status === 404) {
+        // Handle the 404 error specifically
+        console.error("Builder ddress not found in database:", error.info);
+      }
+    },
+  });
+
+  if (isBuilderError) {
+    console.log("isBuilderError", isBuilderError);
+  }
+
+  // ENS NFT Request to Alchemy API
+  const ensLookupUrl = address && isBuilder ? `/api/get-ens-name?eoaAddress=${address}` : null;
+
+  const { data: ensData, error: ensNameError } = useSWR(ensLookupUrl, fetcher);
+
+  if (ensNameError) {
+    console.log("ensNameError", ensNameError);
+  }
+  console.log("ensName", ensData?.name);
+
+  const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
+
+  // Only Buider NFT Contract Request to Alchemy API
+  // Only make the request if the eoa and contract address are defined AND the user has minted an NFT
+  const getNftForOwnerUrl =
+    address && onlyBuildorsNftContract?.address && hasMinted
+      ? `/api/get-nft-for-owner?eoaAddress=${address}&nftContract=${onlyBuildorsNftContract?.address}`
+      : null;
+
+  const { data: nftData, error: nftError } = useSWR(getNftForOwnerUrl, fetcher);
+
+  if (nftError) {
+    console.log("nftError", nftError);
+  }
+
+  /*** Write Contract ***/
+
   const {
     writeAsync: sendRequest,
     isLoading: requestTxIsLoading,
@@ -62,7 +122,7 @@ const Home: NextPage = () => {
   } = useScaffoldContractWrite({
     contractName: "OnlyBuidlorsNft",
     functionName: "sendRequest",
-    args: [SUBSCRIPTION_ID, [address || ""], "matthu.eth"],
+    args: [SUBSCRIPTION_ID, [address || "0x000"], ensData?.name || ""],
     // blockConfirmations: 1,
     onBlockConfirmation: () => {
       setStepsCompleted(1);
@@ -80,32 +140,6 @@ const Home: NextPage = () => {
       setStepsCompleted(3);
     },
   });
-
-  const { data: buidlCount } = useScaffoldContractRead({
-    contractName: "OnlyBuidlorsNft",
-    functionName: "getBuidlCount",
-    args: [address || "0x000"],
-  });
-
-  const { data: hasMinted } = useScaffoldContractRead({
-    contractName: "OnlyBuidlorsNft",
-    functionName: "getHasMinted",
-    args: [address || "0x000"],
-  });
-
-  const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
-
-  // only make the request if the eoa and contract address are defined AND the user has minted an NFT
-  const getNftForOwnerUrl =
-    address && onlyBuildorsNftContract?.address && hasMinted
-      ? `/api/get-nft-for-owner?eoaAddress=${address}&nftContract=${onlyBuildorsNftContract?.address}`
-      : null;
-
-  const { data: nftData, error: nftError } = useSWR(getNftForOwnerUrl, fetcher);
-
-  if (nftError) {
-    console.log("nftError", nftError);
-  }
 
   // only change the image source if the nftData has been successfully fetched
   useEffect(() => {
@@ -137,23 +171,6 @@ const Home: NextPage = () => {
       setImgSrc("/pixel-art.jpg");
     }
   }, [hasMinted, buidlCount, requestTxIsMining, requestTxIsLoading, stepsCompleted]);
-
-  // only make the request if the eoa and contract address are defined AND the user has minted an NFT
-  const bgBuildersUrl = address ? `https://buidlguidl-v3.appspot.com/builders/${address}` : null;
-
-  const { data: isBuilder, error: isBuilderError } = useSWR(bgBuildersUrl, fetcher, {
-    shouldRetryOnError: false, // Do not retry on error
-    onError: error => {
-      if (error.status === 404) {
-        // Handle the 404 error specifically
-        console.error("Builder ddress not found in database:", error.info);
-      }
-    },
-  });
-
-  if (isBuilderError) {
-    console.log("isBuilderError", isBuilderError);
-  }
 
   return (
     <>
