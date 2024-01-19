@@ -1,4 +1,6 @@
-![OnlyBuidlors Thumbnail](https://only-buidlors.vercel.app/readme-logo.jpgs)
+![OnlyBuidlors Thumbnail](https://only-buidlors.vercel.app/readme-logo.png)
+
+https://only-buidlors.vercel.app/
 
 A dynamic SVG NFT project that uses chainlink functions to fetch off chain data from the BuidlGuidl API. All BuidlGuidl members with at least 1 published build are welcome to mint an NFT with a dynamic background color that changes based on the number of builds submitted!
 
@@ -13,8 +15,9 @@ git clone https://github.com/MattPereira/only-buidlors
 ```
 yarn install
 ```
+3. Add a `.env` file to `/packages/nextjs` with a valid `ALCHEMY_API_KEY`. (The frontend does not expose it because its only used in route handlers)
 
-3. Start the project on localhost
+4. Start the project on localhost
 ```
 yarn start
 ```
@@ -27,6 +30,9 @@ Make sure to change the subscriptionId for all the different networks in the `He
 Also need to change `SUBSCRIPTION_ID` on the frontend homepage `index.tsx`
 
 ### Deploying Contracts
+1. Add `.env` file to `/packages/foundry` with a valid `PRIVATE_KEY` and `ETHERSCAN_API_KEY`
+
+2. Run the deploy command 
 ```
 yarn deploy --network arbitrumSepolia
 ```
