@@ -21,6 +21,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     );
 
+    console.log("response", response.data);
+
     // Extract data from response
     const nftsArray = response.data.nfts;
 

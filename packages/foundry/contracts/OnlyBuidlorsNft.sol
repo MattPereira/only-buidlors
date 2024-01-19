@@ -56,7 +56,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         "data:image/svg+xml;base64,";
     string private constant s_uncommonColor = "#16a34a";
     string private constant s_rareColor = "#2563eb";
-    string private constant s_epicColor = "#4f46e5";
+    string private constant s_epicColor = "#9333ea";
     string private constant s_legendaryColor = "#ea580c";
     // associated with chainlink function
     mapping(bytes32 => address) public s_requestIdToMemberAddress;

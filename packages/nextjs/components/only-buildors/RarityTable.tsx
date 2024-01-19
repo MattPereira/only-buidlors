@@ -1,4 +1,25 @@
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth/useScaffoldContractRead";
+
 export const RarityTable = () => {
+  const { data: uncommonColor } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getUncommonColor",
+  });
+
+  const { data: rareColor } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getRareColor",
+  });
+
+  const { data: epicColor } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getEpicColor",
+  });
+
+  const { data: legendaryColor } = useScaffoldContractRead({
+    contractName: "OnlyBuidlorsNft",
+    functionName: "getLegendaryColor",
+  });
   return (
     <div className="bg-primary rounded-xl sm:p-4 w-full max-w-[800px]">
       <div className="overflow-x-auto">
@@ -15,28 +36,36 @@ export const RarityTable = () => {
               <td className="border-b border-primary pt-5">1 to 4</td>
               <td className="border-b border-primary pt-5">Uncommon</td>
               <td className="border-b border-primary pt-5">
-                <div className="bg-green-600 text-green-600 rounded-lg">green</div>
+                <div style={{ backgroundColor: uncommonColor }} className="text-green-600 rounded-lg">
+                  green
+                </div>
               </td>
             </tr>
             <tr>
               <td className="border-b border-primary">5 to 9</td>
               <td className="border-b border-primary">Rare</td>
               <td className="border-b border-primary">
-                <div className="bg-blue-600 text-blue-600 rounded-lg">blue</div>
+                <div style={{ backgroundColor: rareColor }} className="text-blue-600 rounded-lg">
+                  blue
+                </div>
               </td>
             </tr>
             <tr>
               <td className="border-b border-primary">10 to 14</td>
               <td className="border-b border-primary">Epic</td>
               <td className="border-b border-primary">
-                <div className="bg-purple-600 text-purple-600 rounded-lg">purple</div>
+                <div style={{ backgroundColor: epicColor }} className="text-purple-600 rounded-lg">
+                  purple
+                </div>
               </td>
             </tr>
             <tr>
               <td>15 or more</td>
               <td>Legendary</td>
               <td>
-                <div className="bg-orange-600 text-orange-600 rounded-lg">orange</div>
+                <div style={{ backgroundColor: legendaryColor }} className="text-orange-600 rounded-lg">
+                  orange
+                </div>
               </td>
             </tr>
           </tbody>
