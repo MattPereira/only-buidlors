@@ -1,6 +1,8 @@
-![OnlyBuidlors Thumbnail](https://only-buidlors.vercel.app/readme-logo.png)
+![OnlyBuidlors Thumbnail](https://only-buidlors.vercel.app/readme/project-title.png)
 
 A dynamic SVG NFT project that uses chainlink functions to fetch off chain data from the BuidlGuidl API. All BuidlGuidl members with at least 1 published build are welcome to mint an NFT with a dynamic background color that changes based on the number of builds submitted!
+
+![OnlyBuidlors Collection Page](https://only-buidlors.vercel.app/readme/collection-page.png)
 
 ## Getting Started
 
