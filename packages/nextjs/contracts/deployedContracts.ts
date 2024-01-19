@@ -2297,7 +2297,7 @@ const deployedContracts = {
   },
   421614: {
     OnlyBuidlorsNft: {
-      address: "0x0B7F4cb1dab4a9bcaBb6B8684D1BdC9712E7f9EA",
+      address: "0xf89Ab098Aaa1Aa62686BDa80A9cF2d681A39efB8",
       abi: [
         {
           type: "constructor",

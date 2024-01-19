@@ -7,7 +7,12 @@ import { useAccount } from "wagmi";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { Button } from "~~/components/only-buildors/";
-import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth/";
+import {
+  useDeployedContractInfo,
+  useScaffoldContractRead,
+  useScaffoldContractWrite,
+  useScaffoldEventSubscriber,
+} from "~~/hooks/scaffold-eth/";
 import BuidlGuidlIcon from "~~/public/bg-logo.svg";
 
 // Define the steps for the minting process outside component to save resources
@@ -41,15 +46,7 @@ const SUBSCRIPTION_ID = 11n; // arb-sepolia
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 /**
- * 1. display latest NFT that has been minted
- * 2. button to send request to chainlink node
- * 3. animation for transaction mining
- * 4. animation for waiting for chainlink functions node to respond
- * 5. button to mint nft
- * 6. animation for transaction mining
- * 7. display the newly minted NFT in spot where button to mint was before
- *
- * @TODO resolve ens name using mainnet contract and plug into sendRequest writeAsync method
+ * Home page handles minting NFT for eligable users
  */
 const Home: NextPage = () => {
   const [imgSrc, setImgSrc] = useState<string>("/pixel-art.jpg");
@@ -70,6 +67,23 @@ const Home: NextPage = () => {
     functionName: "getHasMinted",
     args: [address || "0x000"],
   });
+
+  /*** Event Subscribers ***/
+  useScaffoldEventSubscriber({
+    contractName: "OnlyBuidlorsNft",
+    eventName: "Response",
+    listener: () => {
+      setStepsCompleted(2);
+    },
+  });
+
+  // useScaffoldEventSubscriber({
+  //   contractName: "OnlyBuidlorsNft",
+  //   eventName: "Minted",
+  //   listener: () => {
+  //     setStepsCompleted(3);
+  //   },
+  // });
 
   /*** API requests ***/
 
@@ -134,8 +148,8 @@ const Home: NextPage = () => {
 
   const {
     writeAsync: mintNft,
-    // isLoading: mintIsLoading,
-    // isMining: mintIsMining,
+    isLoading: mintIsLoading,
+    isMining: mintIsMining,
   } = useScaffoldContractWrite({
     contractName: "OnlyBuidlorsNft",
     functionName: "mintNft",
@@ -144,28 +158,35 @@ const Home: NextPage = () => {
     },
   });
 
-  // only change the image source if the nftData has been successfully fetched
-  useEffect(() => {
-    if (nftData) {
-      try {
-        const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
-        const metadata = JSON.parse(decodedString);
-        setImgSrc(metadata.image);
-      } catch (e) {
-        console.log("error", e);
-      }
-    }
-  }, [nftData]);
+  // Handles showing user's minted NFT if the nftData has been successfully fetched
+  // useEffect(() => {
+  //   if (nftData) {
+  //     try {
+  //       const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
+  //       const metadata = JSON.parse(decodedString);
+  //       setImgSrc(metadata.image);
+  //     } catch (e) {
+  //       console.log("error", e);
+  //     }
+  //   }
+  // }, [nftData]);
 
   // Do I need a state variable in contract to track if member has completed SendRequest (step 1)?
   // How to track when chainlink node has responsed to the request?
   useEffect(() => {
-    if (hasMinted) {
-      setImgSrc("/pixel-art.jpg"); // CHANGE TO SHOWING THE NFT IMAGE
+    if (hasMinted || stepsCompleted === 3) {
       setStepsCompleted(3);
+      if (nftData) {
+        try {
+          const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
+          const metadata = JSON.parse(decodedString);
+          setImgSrc(metadata.image);
+        } catch (e) {
+          console.log("error", e);
+        }
+      }
     } else if (buidlCount && buidlCount > 0n) {
       setImgSrc("/step-3.jpg");
-      setStepsCompleted(2);
     } else if (stepsCompleted === 1) {
       setImgSrc("/step-2.jpg");
     } else if (requestTxIsMining || requestTxIsLoading) {
@@ -173,7 +194,7 @@ const Home: NextPage = () => {
     } else {
       setImgSrc("/pixel-art.jpg");
     }
-  }, [hasMinted, buidlCount, requestTxIsMining, requestTxIsLoading, stepsCompleted]);
+  }, [hasMinted, buidlCount, requestTxIsMining, requestTxIsLoading, stepsCompleted, nftData]);
 
   return (
     <>
@@ -225,15 +246,29 @@ const Home: NextPage = () => {
               </div>
 
               <div className="flex flex-col justify-center items-center">
-                {hasMinted ? (
+                {hasMinted || stepsCompleted === 3 ? (
                   <Link href="/collection">
                     <Button>View Collection</Button>
                   </Link>
                 ) : buidlCount && buidlCount > 0n ? (
-                  <Button onClick={() => mintNft()}>Mint NFT</Button>
+                  <Button disabled={mintIsLoading || mintIsMining} onClick={() => mintNft()}>
+                    {mintIsLoading || mintIsMining ? (
+                      <div className="flex gap-2">
+                        Minting<span className="loading loading-dots loading-lg"></span>
+                      </div>
+                    ) : (
+                      "Mint NFT"
+                    )}
+                  </Button>
                 ) : (
                   <Button onClick={() => sendRequest()} disabled={stepsCompleted >= 1}>
-                    {stepsCompleted >= 1 ? "Request proccessing..." : "Send Request"}
+                    {stepsCompleted >= 1 ? (
+                      <div className="flex gap-2">
+                        Request proccessing<span className="loading loading-dots loading-lg"></span>
+                      </div>
+                    ) : (
+                      "Send Request"
+                    )}
                   </Button>
                 )}
               </div>
