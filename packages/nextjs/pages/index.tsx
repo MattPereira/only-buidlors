@@ -54,6 +54,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
 const Home: NextPage = () => {
   const [imgSrc, setImgSrc] = useState<string>("/pixel-art.jpg");
   const [stepsCompleted, setStepsCompleted] = useState(0);
+  console.log("stepsCompleted", stepsCompleted);
 
   const { address } = useAccount();
 
@@ -190,7 +191,6 @@ const Home: NextPage = () => {
                 </h1>
               </div>
             </div>
-
             <div className="text-xl sm:text-2xl xl:text-3xl">A dynamic SVG NFT collection for the BuidlGuidl</div>
           </div>
 

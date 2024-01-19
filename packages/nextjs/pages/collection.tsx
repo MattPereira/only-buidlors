@@ -54,9 +54,20 @@ const Collection: NextPage = () => {
 
         <div className="my-14">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-14">
-            {nfts.map((nft: any) => (
-              <Image key={nft.image} width={700} height={700} src={nft.image} alt={nft.name} className="rounded-xl" />
-            ))}
+            {nfts.length > 0
+              ? nfts.map((nft: any) => (
+                  <Image
+                    key={nft.image}
+                    width={700}
+                    height={700}
+                    src={nft.image}
+                    alt={nft.name}
+                    className="rounded-xl"
+                  />
+                ))
+              : Array.from(Array(4).keys()).map((_, idx) => (
+                  <div key={idx} className="skeleton animate-pulse bg-base-100 rounded-xl w-full h-72"></div>
+                ))}
           </div>
         </div>
       </section>
