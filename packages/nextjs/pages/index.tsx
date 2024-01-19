@@ -56,6 +56,8 @@ const Home: NextPage = () => {
   const { address } = useAccount();
 
   /*** Read Contract ***/
+  const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
+
   const { data: buidlCount } = useScaffoldContractRead({
     contractName: "OnlyBuidlorsNft",
     functionName: "getBuidlCount",
@@ -77,61 +79,48 @@ const Home: NextPage = () => {
     },
   });
 
-  // useScaffoldEventSubscriber({
-  //   contractName: "OnlyBuidlorsNft",
-  //   eventName: "Minted",
-  //   listener: () => {
-  //     setStepsCompleted(3);
-  //   },
-  // });
+  useScaffoldEventSubscriber({
+    contractName: "OnlyBuidlorsNft",
+    eventName: "Minted",
+    listener: () => {
+      setStepsCompleted(3);
+    },
+  });
 
   /*** API requests ***/
 
-  // BuidlGuidl API Request
-  // only make the request if the eoa and contract address are defined AND the user has minted an NFT
+  // Only make BuidlGuidl API Request if the eoa and contract address are defined AND the user has minted an NFT
   const bgBuildersUrl = address ? `https://buidlguidl-v3.appspot.com/builders/${address}` : null;
-
   const { data: isBuilder, error: isBuilderError } = useSWR(bgBuildersUrl, fetcher, {
     shouldRetryOnError: false, // Do not retry on error
     onError: error => {
       if (error.status === 404) {
-        // Handle the 404 error specifically
         console.error("Builder ddress not found in database:", error.info);
       }
     },
   });
-
   if (isBuilderError) {
     console.log("isBuilderError", isBuilderError);
   }
 
-  // ENS NFT Request to Alchemy API
+  // Only make ENS NFT Request to Alchemy API if the BuidlGuidl API request was successful
   const ensLookupUrl = address && isBuilder ? `/api/get-ens-name?eoaAddress=${address}` : null;
-
   const { data: ensData, error: ensNameError } = useSWR(ensLookupUrl, fetcher);
-
   if (ensNameError) {
     console.log("ensNameError", ensNameError);
   }
-  console.log("ensName", ensData?.name);
 
-  const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
-
-  // Only Buider NFT Contract Request to Alchemy API
-  // Only make the request if the eoa and contract address are defined AND the user has minted an NFT
+  // Only make OBDL collection request to Alchemy API eoa and contract address are defined AND the user has minted an NFT
   const getNftForOwnerUrl =
-    address && onlyBuildorsNftContract?.address && hasMinted
+    address && onlyBuildorsNftContract?.address && (hasMinted || stepsCompleted === 3)
       ? `/api/get-nft-for-owner?eoaAddress=${address}&nftContract=${onlyBuildorsNftContract?.address}`
       : null;
-
   const { data: nftData, error: nftError } = useSWR(getNftForOwnerUrl, fetcher);
-
   if (nftError) {
     console.log("nftError", nftError);
   }
 
   /*** Write Contract ***/
-
   const {
     writeAsync: sendRequest,
     isLoading: requestTxIsLoading,
@@ -140,7 +129,6 @@ const Home: NextPage = () => {
     contractName: "OnlyBuidlorsNft",
     functionName: "sendRequest",
     args: [SUBSCRIPTION_ID, [address || "0x000"], ensData?.name || ""],
-    // blockConfirmations: 1,
     onBlockConfirmation: () => {
       setStepsCompleted(1);
     },
@@ -158,21 +146,7 @@ const Home: NextPage = () => {
     },
   });
 
-  // Handles showing user's minted NFT if the nftData has been successfully fetched
-  // useEffect(() => {
-  //   if (nftData) {
-  //     try {
-  //       const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
-  //       const metadata = JSON.parse(decodedString);
-  //       setImgSrc(metadata.image);
-  //     } catch (e) {
-  //       console.log("error", e);
-  //     }
-  //   }
-  // }, [nftData]);
-
-  // Do I need a state variable in contract to track if member has completed SendRequest (step 1)?
-  // How to track when chainlink node has responsed to the request?
+  // Controls the image/button displayed based on the state of the minting process
   useEffect(() => {
     if (hasMinted || stepsCompleted === 3) {
       setStepsCompleted(3);

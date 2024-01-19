@@ -53,6 +53,9 @@ const Collection: NextPage = () => {
         </div>
 
         <div className="my-14">
+          <div className="text-xl text-center mb-5">
+            ( Sometimes Vercel gets sleepy and takes up to ~30 seconds to respond )
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-14">
             {nfts.length > 0
               ? nfts.map((nft: any) => (
