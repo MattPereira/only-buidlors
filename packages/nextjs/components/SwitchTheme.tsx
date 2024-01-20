@@ -12,7 +12,7 @@ export const SwitchTheme = ({ className }: { className?: string }) => {
   }, [isDarkMode]);
 
   return (
-    <div className={`flex ml-3 ${className}`}>
+    <div className={`flex ${className}`}>
       {/* <input
         id="theme-toggle"
         type="checkbox"

@@ -108,7 +108,7 @@ export const Header = () => {
       <div className="navbar-end flex-grow mr-4">
         <RainbowKitCustomConnectButton />
         <FaucetButton />
-        <SwitchTheme />
+        <SwitchTheme className="ml-3" />
       </div>
     </div>
   );
