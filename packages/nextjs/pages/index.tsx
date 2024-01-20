@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { NextPage } from "next";
 import useSWR from "swr";
+import { createPublicClient, http } from "viem";
+import { mainnet } from "viem/chains";
 import { useAccount } from "wagmi";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
@@ -14,6 +16,11 @@ import {
   useScaffoldEventSubscriber,
 } from "~~/hooks/scaffold-eth/";
 import BuidlGuidlIcon from "~~/public/bg-logo.svg";
+
+export const publicClient = createPublicClient({
+  chain: mainnet,
+  transport: http(),
+});
 
 // Define the steps for the minting process outside component to save resources
 const steps = [
@@ -51,9 +58,31 @@ const fetcher = (url: string) => fetch(url).then(res => res.json());
 const Home: NextPage = () => {
   const [imgSrc, setImgSrc] = useState<string>("/pixel-art.jpg");
   const [stepsCompleted, setStepsCompleted] = useState(0);
+  const [ensName, setEnsName] = useState<string | null>(null);
   console.log("stepsCompleted", stepsCompleted);
 
+  const publicClient = createPublicClient({
+    chain: mainnet,
+    transport: http(),
+  });
+
   const { address } = useAccount();
+
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      if (address) {
+        try {
+          const ensName = await publicClient.getEnsName({ address: address });
+          setEnsName(ensName);
+        } catch (error) {
+          console.error("Error fetching ENS name:", error);
+        }
+      }
+    };
+
+    fetchEnsName();
+  }, [address, publicClient]);
+  console.log("ensName", ensName);
 
   /*** Read Contract ***/
   const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
@@ -103,13 +132,6 @@ const Home: NextPage = () => {
     console.log("isBuilderError", isBuilderError);
   }
 
-  // Only make ENS NFT Request to Alchemy API if the BuidlGuidl API request was successful
-  const ensLookupUrl = address && isBuilder ? `/api/get-ens-name?eoaAddress=${address}` : null;
-  const { data: ensData, error: ensNameError } = useSWR(ensLookupUrl, fetcher);
-  if (ensNameError) {
-    console.log("ensNameError", ensNameError);
-  }
-
   // Only make OBDL collection request to Alchemy API eoa and contract address are defined AND the user has minted an NFT
   const getNftForOwnerUrl =
     address && onlyBuildorsNftContract?.address && (hasMinted || stepsCompleted === 3)
@@ -128,7 +150,7 @@ const Home: NextPage = () => {
   } = useScaffoldContractWrite({
     contractName: "OnlyBuidlorsNft",
     functionName: "sendRequest",
-    args: [SUBSCRIPTION_ID, [address || "0x000"], ensData?.name || ""],
+    args: [SUBSCRIPTION_ID, [address || "0x000"], ensName || ""],
     onBlockConfirmation: () => {
       setStepsCompleted(1);
     },

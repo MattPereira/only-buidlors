@@ -37,6 +37,8 @@ const Collection: NextPage = () => {
     }
   }, [nftsData]);
 
+  console.log("nfts", nfts);
+
   return (
     <>
       <section className="p-5 md:p-10 xl:p-14">
