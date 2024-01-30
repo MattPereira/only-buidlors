@@ -78,13 +78,13 @@ const Home: NextPage = () => {
   const { data: buidlCount } = useScaffoldContractRead({
     contractName: "OnlyBuidlorsNft",
     functionName: "getBuidlCount",
-    args: [address || "0x000"],
+    args: [address || "0x0000000000000000000000000000000000000000"],
   });
 
   const { data: hasMinted } = useScaffoldContractRead({
     contractName: "OnlyBuidlorsNft",
     functionName: "getHasMinted",
-    args: [address || "0x000"],
+    args: [address || "0x0000000000000000000000000000000000000000"],
   });
 
   /*** Event Subscribers ***/
