@@ -70,8 +70,6 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     // associated with chainlink function
     mapping(bytes32 => address) public s_requestIdToMemberAddress;
     bytes32 public s_lastRequestId;
-    // bytes public s_lastResponse;
-    // bytes public s_lastError;
     uint32 public s_gasLimit;
     bytes32 public s_donID;
     string public s_source =
@@ -339,7 +337,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     }
 
     /**
-     * May try to handle minting with chainlink automation listening for "Response" event from function above
+     * May try to handle minting with chainlink automation by listening for "Response" event from function above
      */
     function mintNft() public {
         require(

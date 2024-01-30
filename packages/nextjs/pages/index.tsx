@@ -57,6 +57,7 @@ const Home: NextPage = () => {
 
   const { address } = useAccount();
 
+  // Save ENS name to state for arg in the minting NFT transaction
   useEffect(() => {
     const fetchEnsName = async () => {
       if (address) {
@@ -170,7 +171,9 @@ const Home: NextPage = () => {
     };
 
     if (hasMinted || stepsCompleted === 3) {
-      setStepsCompleted(3);
+      if (stepsCompleted !== 3) {
+        setStepsCompleted(3);
+      }
       if (nftData) {
         try {
           const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
@@ -181,6 +184,7 @@ const Home: NextPage = () => {
         }
       }
     } else if (buidlCount && buidlCount > 0n) {
+      setStepsCompleted(2);
       updateImageWithFade("/step-3.jpg");
     } else if (stepsCompleted === 1) {
       updateImageWithFade("/step-2.jpg");
@@ -197,7 +201,7 @@ const Home: NextPage = () => {
       <section className="p-5 md:p-10 lg:px-16 2xl:p-24 grow flex flex-col">
         <div className="grid grid-cols-1 2xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
           <div>
-            <div className="flex justify-center lg:justify-start mb-">
+            <div className="flex justify-center lg:justify-start">
               <div className="mr-5 w-[120px] h-[120px] lg:w-[200px] lg:h-[300px]">
                 <BuidlGuidlIcon alt="github icon" />
               </div>
@@ -229,12 +233,12 @@ const Home: NextPage = () => {
                 {steps.map(step => (
                   <div key={step.number} className="text-2xl flex gap-4 mb-8 items-start">
                     <div
-                      style={{ minWidth: "40px" }}
+                      style={{ minWidth: "55px" }}
                       className={`${
-                        stepsCompleted >= step.number ? "bg-green-600" : "bg-primary"
-                      } font-bold w-10 h-10 flex items-center justify-center rounded-full text-primary-content`}
+                        stepsCompleted >= step.number ? "bg-green-600" : "bg-base-300"
+                      } border-2 border-base-content text-3xl font-bold w-[55px] h-[55px] flex items-center justify-center rounded-full text-base-content`}
                     >
-                      {stepsCompleted >= step.number ? <CheckIcon className="w-6 h-6 text-white" /> : step.number}
+                      {stepsCompleted >= step.number ? <CheckIcon className="w-8 h-8 text-primary" /> : step.number}
                     </div>
                     <div>{step.text}</div>
                   </div>
