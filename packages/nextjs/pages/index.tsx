@@ -17,40 +17,33 @@ import {
 } from "~~/hooks/scaffold-eth/";
 import BuidlGuidlIcon from "~~/public/bg-logo.svg";
 
-export const publicClient = createPublicClient({
-  chain: mainnet,
-  transport: http(),
-});
-
 // Define the steps for the minting process outside component to save resources
 const steps = [
   {
     number: 1,
-    text: (
-      <>Send a transaction to the NFT contract that emits an event which chainlink function nodes are listening for</>
-    ),
+    text: " Send a transaction to the NFT contract that emits an event which chainlink function nodes are listening for",
   },
   {
     number: 2,
-    text: (
-      <>
-        Wait for chainlink node to execute off chain API call to BuidlGuidl server and relay the response to the NFT
-        contract
-      </>
-    ),
+    text: "Wait for chainlink node to execute off chain API call to BuidlGuidl server and relay the response to the NFT contract",
   },
   {
     number: 3,
-    text: <>Send a second transaction to the NFT contract to mint your OnlyBuidlors NFT</>,
+    text: "Send a second transaction to the NFT contract to mint your OnlyBuidlors NFT",
   },
 ];
 
 // Define the subscription ID for the Chainlink functions (specific to each network)
-// const SUBSCRIPTION_ID = 1905n; // eth-sepolia
 const SUBSCRIPTION_ID = 11n; // arb-sepolia
 
 // Define the fetcher function for SWR
 const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+// Create a public client for querying ENS names
+const publicClient = createPublicClient({
+  chain: mainnet,
+  transport: http(),
+});
 
 /**
  * Home page handles minting NFT for eligable users
@@ -61,11 +54,6 @@ const Home: NextPage = () => {
   const [ensName, setEnsName] = useState<string | null>(null);
   const [opacity, setOpacity] = useState(1); // State for controlling opacity of image
   console.log("stepsCompleted", stepsCompleted);
-
-  const publicClient = createPublicClient({
-    chain: mainnet,
-    transport: http(),
-  });
 
   const { address } = useAccount();
 
@@ -82,8 +70,7 @@ const Home: NextPage = () => {
     };
 
     fetchEnsName();
-  }, [address, publicClient]);
-  console.log("ensName", ensName);
+  }, [address]);
 
   /*** Read Contract ***/
   const { data: onlyBuildorsNftContract } = useDeployedContractInfo("OnlyBuidlorsNft");
@@ -153,7 +140,9 @@ const Home: NextPage = () => {
     functionName: "sendRequest",
     args: [SUBSCRIPTION_ID, [address || "0x000"], ensName || ""],
     onBlockConfirmation: () => {
-      setStepsCompleted(1);
+      if (stepsCompleted === 0) {
+        setStepsCompleted(1);
+      }
     },
   });
 
@@ -165,7 +154,9 @@ const Home: NextPage = () => {
     contractName: "OnlyBuidlorsNft",
     functionName: "mintNft",
     onBlockConfirmation: () => {
-      setStepsCompleted(3);
+      if (stepsCompleted !== 3) {
+        setStepsCompleted(3);
+      }
     },
   });
 
@@ -279,31 +270,7 @@ const Home: NextPage = () => {
               </div>
             </div>
           ) : (
-            <div className="text-xl sm:text-2xl xl:text-3xl text-center">
-              <div className="mb-10">
-                Connect the wallet associated with your{" "}
-                <a
-                  className="underline text-accent"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://app.buidlguidl.com/builders/0x41f727fA294E50400aC27317832A9F78659476B9"
-                >
-                  BuidlGuidl profile
-                </a>{" "}
-                to mint an NFT
-              </div>
-              <div>
-                If you are not a member yet, join us by the completing challenges at{" "}
-                <a
-                  className="underline text-accent"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://speedrunethereum.com/"
-                >
-                  Speedrun Ethereum
-                </a>
-              </div>
-            </div>
+            <InvalidAddressExplanation />
           )}
         </div>
       </section>
@@ -312,3 +279,36 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+/**
+ * Shows if wallet not connected or address not associated with a BuidlGuidl profile
+ */
+const InvalidAddressExplanation = () => {
+  return (
+    <div className="text-xl sm:text-2xl xl:text-3xl text-center">
+      <div className="mb-10">
+        Connect the wallet associated with your{" "}
+        <a
+          className="underline text-accent"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://app.buidlguidl.com/builders/0x41f727fA294E50400aC27317832A9F78659476B9"
+        >
+          BuidlGuidl profile
+        </a>{" "}
+        to mint an NFT
+      </div>
+      <div>
+        If you are not a member yet, join us by the completing challenges at{" "}
+        <a
+          className="underline text-accent"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://speedrunethereum.com/"
+        >
+          Speedrun Ethereum
+        </a>
+      </div>
+    </div>
+  );
+};

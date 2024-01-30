@@ -43,6 +43,18 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     error UnexpectedRequestID(bytes32 requestId);
 
     /*** Types ***/
+    enum RarityTier {
+        Uncommon,
+        Rare,
+        Epic,
+        Legendary
+    }
+
+    struct RarityAttributes {
+        string name;
+        string hexColor;
+    }
+
     struct MemberData {
         string ensName;
         uint256 buildCount;
@@ -50,14 +62,11 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
 
     /*** State Variables ***/
     mapping(address => MemberData) public s_memberToData;
+    mapping(RarityTier => RarityAttributes) public s_rarityDetails;
     mapping(address => bool) private s_hasMinted;
     uint256 private s_tokenCounter;
     string private constant s_base64EncodedSvgPrefix =
         "data:image/svg+xml;base64,";
-    string private constant s_uncommonColor = "#16a34a";
-    string private constant s_rareColor = "#2563eb";
-    string private constant s_epicColor = "#9333ea";
-    string private constant s_legendaryColor = "#ea580c";
     // associated with chainlink function
     mapping(bytes32 => address) public s_requestIdToMemberAddress;
     bytes32 public s_lastRequestId;
@@ -112,6 +121,16 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         s_tokenCounter = 0; // first NFT minted has tokenId of 0
         s_donID = donId;
         s_gasLimit = gasLimit;
+        s_rarityDetails[RarityTier.Uncommon] = RarityAttributes(
+            "Uncommon",
+            "#16a34a"
+        );
+        s_rarityDetails[RarityTier.Rare] = RarityAttributes("Rare", "#2563eb");
+        s_rarityDetails[RarityTier.Epic] = RarityAttributes("Epic", "#9333ea");
+        s_rarityDetails[RarityTier.Legendary] = RarityAttributes(
+            "Legendary",
+            "#ea580c"
+        );
     }
 
     /**
@@ -122,17 +141,21 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     ) public view override returns (string memory) {
         require(tokenId < s_tokenCounter, "Token id does not exist.");
         string memory imageURI = svgToImageURI(tokenId);
-        string memory rarity;
         uint256 memberBuildCount = s_memberToData[ownerOf(tokenId)].buildCount;
+
+        RarityTier tier;
         if (memberBuildCount < 5) {
-            rarity = "Uncommon";
+            tier = RarityTier.Uncommon;
         } else if (memberBuildCount < 10) {
-            rarity = "Rare";
+            tier = RarityTier.Rare;
         } else if (memberBuildCount < 15) {
-            rarity = "Epic";
+            tier = RarityTier.Epic;
         } else {
-            rarity = "Legendary";
+            tier = RarityTier.Legendary;
         }
+
+        RarityAttributes memory rarity = s_rarityDetails[tier];
+
         return
             string(
                 abi.encodePacked(
@@ -143,7 +166,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
                                 '{"name": "',
                                 name(),
                                 '", "description": "Dynamic SVG NFT that tracks BuidlGuidl member data", "attributes": [{"trait_type": "rarity", "value": "',
-                                rarity,
+                                rarity.name,
                                 '"}], "image": "',
                                 imageURI,
                                 '"}'
@@ -163,16 +186,19 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     ) public view returns (string memory) {
         address ownerAddr = ownerOf(tokenId);
         uint256 memberBuildCount = s_memberToData[ownerAddr].buildCount;
-        string memory color;
+        RarityTier tier;
         if (memberBuildCount < 5) {
-            color = s_uncommonColor;
+            tier = RarityTier.Uncommon;
         } else if (memberBuildCount < 10) {
-            color = s_rareColor;
+            tier = RarityTier.Rare;
         } else if (memberBuildCount < 15) {
-            color = s_epicColor;
+            tier = RarityTier.Epic;
         } else {
-            color = s_legendaryColor;
+            tier = RarityTier.Legendary;
         }
+
+        RarityAttributes memory rarity = s_rarityDetails[tier];
+        string memory color = rarity.hexColor;
         string memory svgTop = buildSvgTop(color);
         string memory svgBottom = buildSvgBottom(color, tokenId);
         string memory svgBase64Encoded = Base64.encode(
@@ -353,19 +379,10 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         return s_lastRequestId;
     }
 
-    function getUncommonColor() public pure returns (string memory) {
-        return s_uncommonColor;
-    }
-
-    function getRareColor() public pure returns (string memory) {
-        return s_rareColor;
-    }
-
-    function getEpicColor() public pure returns (string memory) {
-        return s_epicColor;
-    }
-
-    function getLegendaryColor() public pure returns (string memory) {
-        return s_legendaryColor;
+    function getRarityDetails(
+        RarityTier tier
+    ) public view returns (string memory, string memory) {
+        RarityAttributes memory attributes = s_rarityDetails[tier];
+        return (attributes.name, attributes.hexColor);
     }
 }

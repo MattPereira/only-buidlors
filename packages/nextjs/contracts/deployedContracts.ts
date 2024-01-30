@@ -2297,7 +2297,7 @@ const deployedContracts = {
   },
   421614: {
     OnlyBuidlorsNft: {
-      address: "0x19AfFb41773D7699f368Ca181E2BEAC3f42f6f99",
+      address: "0x3Bc640ab394D8A884C8101335caBd7aA099faa18",
       abi: [
         {
           type: "constructor",
@@ -2423,19 +2423,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getEpicColor",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
           name: "getHasMinted",
           inputs: [
             {
@@ -2481,42 +2468,27 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getLegendaryColor",
-          inputs: [],
+          name: "getRarityDetails",
+          inputs: [
+            {
+              name: "tier",
+              type: "uint8",
+              internalType: "enum OnlyBuidlorsNft.RarityTier",
+            },
+          ],
           outputs: [
             {
               name: "",
               type: "string",
               internalType: "string",
             },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "getRareColor",
-          inputs: [],
-          outputs: [
             {
               name: "",
               type: "string",
               internalType: "string",
             },
           ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "getUncommonColor",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-          stateMutability: "pure",
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -2676,6 +2648,30 @@ const deployedContracts = {
               name: "buildCount",
               type: "uint256",
               internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "s_rarityDetails",
+          inputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "enum OnlyBuidlorsNft.RarityTier",
+            },
+          ],
+          outputs: [
+            {
+              name: "name",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "hexColor",
+              type: "string",
+              internalType: "string",
             },
           ],
           stateMutability: "view",
@@ -3424,19 +3420,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getEpicColor",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
           name: "getHasMinted",
           inputs: [
             {
@@ -3482,42 +3465,27 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getLegendaryColor",
-          inputs: [],
+          name: "getRarityDetails",
+          inputs: [
+            {
+              name: "tier",
+              type: "uint8",
+              internalType: "enum OnlyBuidlorsNft.RarityTier",
+            },
+          ],
           outputs: [
             {
               name: "",
               type: "string",
               internalType: "string",
             },
-          ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "getRareColor",
-          inputs: [],
-          outputs: [
             {
               name: "",
               type: "string",
               internalType: "string",
             },
           ],
-          stateMutability: "pure",
-        },
-        {
-          type: "function",
-          name: "getUncommonColor",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-          stateMutability: "pure",
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -3677,6 +3645,30 @@ const deployedContracts = {
               name: "buildCount",
               type: "uint256",
               internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "s_rarityDetails",
+          inputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "enum OnlyBuidlorsNft.RarityTier",
+            },
+          ],
+          outputs: [
+            {
+              name: "name",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "hexColor",
+              type: "string",
+              internalType: "string",
             },
           ],
           stateMutability: "view",
