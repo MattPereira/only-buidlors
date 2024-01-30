@@ -30,11 +30,11 @@ yarn start
 
 ### Create Chainlink Functions Subscription
 
-The deployment script is setup to automatically add any freshly deployed contract to a chainlink functions subscription, but the subscription itself must be created at functions.chain.link
+1. The deployment script is setup to automatically add any freshly deployed contract to a chainlink functions subscription, but the subscription itself must be created at functions.chain.link
 
-Make sure to change the subscriptionId for all the different networks in the `HelperConfig.s.sol`
+2. Change the subscriptionId for the corresponding network where your subscriptionw was created in the `HelperConfig.s.sol`
 
-Also need to change `SUBSCRIPTION_ID` on the frontend homepage `index.tsx`
+3. Change `SUBSCRIPTION_ID` constant on the frontend homepage `index.tsx` which is needed for kicking off request to chainlink functions node
 
 ### Deploying Contracts
 

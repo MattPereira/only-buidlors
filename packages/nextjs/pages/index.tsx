@@ -59,6 +59,7 @@ const Home: NextPage = () => {
   const [imgSrc, setImgSrc] = useState<string>("/pixel-art.jpg");
   const [stepsCompleted, setStepsCompleted] = useState(0);
   const [ensName, setEnsName] = useState<string | null>(null);
+  const [opacity, setOpacity] = useState(1); // State for controlling opacity of image
   console.log("stepsCompleted", stepsCompleted);
 
   const publicClient = createPublicClient({
@@ -132,7 +133,7 @@ const Home: NextPage = () => {
     console.log("isBuilderError", isBuilderError);
   }
 
-  // Only make OBDL collection request to Alchemy API eoa and contract address are defined AND the user has minted an NFT
+  // Only make NFT collection request to Alchemy API if eoa and contract address are defined AND the user has minted an NFT
   const getNftForOwnerUrl =
     address && onlyBuildorsNftContract?.address && (hasMinted || stepsCompleted === 3)
       ? `/api/get-nft-for-owner?eoaAddress=${address}&nftContract=${onlyBuildorsNftContract?.address}`
@@ -170,25 +171,32 @@ const Home: NextPage = () => {
 
   // Controls the image/button displayed based on the state of the minting process
   useEffect(() => {
+    const updateImageWithFade = async (newSrc: string) => {
+      setOpacity(0); // Fade out current image
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for fade-out
+      setImgSrc(newSrc); // Set new image source
+      setOpacity(1); // Fade in new image
+    };
+
     if (hasMinted || stepsCompleted === 3) {
       setStepsCompleted(3);
       if (nftData) {
         try {
           const decodedString = Buffer.from(nftData.raw.tokenUri, "base64").toString("utf-8");
           const metadata = JSON.parse(decodedString);
-          setImgSrc(metadata.image);
+          updateImageWithFade(metadata.image);
         } catch (e) {
           console.log("error", e);
         }
       }
     } else if (buidlCount && buidlCount > 0n) {
-      setImgSrc("/step-3.jpg");
+      updateImageWithFade("/step-3.jpg");
     } else if (stepsCompleted === 1) {
-      setImgSrc("/step-2.jpg");
+      updateImageWithFade("/step-2.jpg");
     } else if (requestTxIsMining || requestTxIsLoading) {
-      setImgSrc("/step-1.jpg");
+      updateImageWithFade("/step-1.jpg");
     } else {
-      setImgSrc("/pixel-art.jpg");
+      updateImageWithFade("/pixel-art.jpg");
     }
   }, [hasMinted, buidlCount, requestTxIsMining, requestTxIsLoading, stepsCompleted, nftData]);
 
@@ -217,7 +225,8 @@ const Home: NextPage = () => {
               width={800}
               height={700}
               alt="dynamic image of minting proccess and final NFT"
-              className="rounded-xl"
+              className="rounded-xl transition-opacity duration-1000"
+              style={{ opacity }} // apply dynamic opacity based on state
             />
           </div>
         </div>

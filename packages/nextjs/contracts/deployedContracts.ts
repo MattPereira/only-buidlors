@@ -2297,7 +2297,7 @@ const deployedContracts = {
   },
   421614: {
     OnlyBuidlorsNft: {
-      address: "0x00240adFd2D3dd37C4557118261C667266F28590",
+      address: "0x19AfFb41773D7699f368Ca181E2BEAC3f42f6f99",
       abi: [
         {
           type: "constructor",
@@ -2567,19 +2567,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "minNftOnBehalfOf",
-          inputs: [
-            {
-              name: "memberAddr",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
           name: "mintNft",
           inputs: [],
           outputs: [],
@@ -2794,40 +2781,6 @@ const deployedContracts = {
               name: "ensName",
               type: "string",
               internalType: "string",
-            },
-          ],
-          outputs: [
-            {
-              name: "requestId",
-              type: "bytes32",
-              internalType: "bytes32",
-            },
-          ],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "sendRequestOnBehalfOf",
-          inputs: [
-            {
-              name: "subscriptionId",
-              type: "uint64",
-              internalType: "uint64",
-            },
-            {
-              name: "args",
-              type: "string[]",
-              internalType: "string[]",
-            },
-            {
-              name: "ensName",
-              type: "string",
-              internalType: "string",
-            },
-            {
-              name: "memberAddr",
-              type: "address",
-              internalType: "address",
             },
           ],
           outputs: [
@@ -3615,19 +3568,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "minNftOnBehalfOf",
-          inputs: [
-            {
-              name: "memberAddr",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
           name: "mintNft",
           inputs: [],
           outputs: [],
@@ -3842,40 +3782,6 @@ const deployedContracts = {
               name: "ensName",
               type: "string",
               internalType: "string",
-            },
-          ],
-          outputs: [
-            {
-              name: "requestId",
-              type: "bytes32",
-              internalType: "bytes32",
-            },
-          ],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "sendRequestOnBehalfOf",
-          inputs: [
-            {
-              name: "subscriptionId",
-              type: "uint64",
-              internalType: "uint64",
-            },
-            {
-              name: "args",
-              type: "string[]",
-              internalType: "string[]",
-            },
-            {
-              name: "ensName",
-              type: "string",
-              internalType: "string",
-            },
-            {
-              name: "memberAddr",
-              type: "address",
-              internalType: "address",
             },
           ],
           outputs: [

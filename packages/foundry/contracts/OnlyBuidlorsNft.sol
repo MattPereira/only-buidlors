@@ -313,7 +313,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     }
 
     /**
-     *
+     * May try to handle minting with chainlink automation listening for "Response" event from function above
      */
     function mintNft() public {
         require(
@@ -327,50 +327,6 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         _safeMint(msg.sender, s_tokenCounter);
         s_hasMinted[msg.sender] = true;
         emit Minted(msg.sender, s_tokenCounter);
-        s_tokenCounter++;
-    }
-
-    /**
-     * @notice only contract owner can send request on behalf of another member
-     * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
-     * @param args the arguments to pass to the javascript source code
-     * @param ensName ens name resolved by frontend and passed in as an argument for updating the svg
-     */
-    function sendRequestOnBehalfOf(
-        uint64 subscriptionId,
-        string[] calldata args,
-        string memory ensName,
-        address memberAddr
-    ) external onlyOwner returns (bytes32 requestId) {
-        FunctionsRequest.Request memory req;
-        req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
-        if (args.length > 0) req.setArgs(args); // Set the arguments for the request
-        // Send the request and store the request ID
-        s_lastRequestId = _sendRequest(
-            req.encodeCBOR(),
-            subscriptionId,
-            s_gasLimit,
-            s_donID
-        );
-        s_requestIdToMemberAddress[s_lastRequestId] = memberAddr;
-        s_memberToData[memberAddr].ensName = ensName;
-        return s_lastRequestId;
-    }
-
-    /**
-     * @notice only owner of contract can mint NFT on behalf of another member
-     */
-    function minNftOnBehalfOf(address memberAddr) public onlyOwner {
-        require(
-            !s_hasMinted[memberAddr],
-            "This BuidlGuidl member has already minted an NFT"
-        );
-        require(
-            s_memberToData[memberAddr].buildCount > 0,
-            "Must ship at least one build to earn NFT"
-        );
-        _safeMint(memberAddr, s_tokenCounter);
-        s_hasMinted[memberAddr] = true;
         s_tokenCounter++;
     }
 
