@@ -39,10 +39,12 @@ import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0
 contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     using FunctionsRequest for FunctionsRequest.Request;
 
-    /*** Errors ***/
+    ////////// Errors //////////
     error UnexpectedRequestID(bytes32 requestId);
+    error AlreadyMinted(address member);
+    error MustShipAtLeastOneBuild(address member);
 
-    /*** Types ***/
+    ////////// Types //////////
     enum RarityTier {
         Uncommon,
         Rare,
@@ -60,7 +62,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         uint256 buildCount;
     }
 
-    /*** State Variables ***/
+    ////////// State Variables //////////
     mapping(address => MemberData) public s_memberToData;
     mapping(RarityTier => RarityAttributes) public s_rarityDetails;
     mapping(address => bool) private s_hasMinted;
@@ -87,7 +89,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         "}"
         "return Functions.encodeUint256(buildCount);";
 
-    /*** Events ***/
+    ////////// Events //////////
     event Request(
         address indexed member,
         string indexed argsZero,
@@ -101,6 +103,8 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
     );
 
     event Minted(address indexed member, uint256 indexed tokenId);
+
+    ////////// Functions //////////
 
     /**
      * @param router address of chainlink router
@@ -131,6 +135,70 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         );
     }
 
+    /** @notice sends request to chainlink node for off chain execution of JS source code
+     * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
+     * @param args the arguments to pass to the javascript source code
+     * @param ensName ens name resolved by frontend and passed in as an argument for updating the svg
+     */
+    function sendRequest(
+        uint64 subscriptionId,
+        string[] calldata args,
+        string memory ensName
+    ) external returns (bytes32 requestId) {
+        FunctionsRequest.Request memory req;
+        req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
+        if (args.length > 0) req.setArgs(args); // Set the arguments for the request
+        // Send the request and store the request ID
+        s_lastRequestId = _sendRequest(
+            req.encodeCBOR(),
+            subscriptionId,
+            s_gasLimit,
+            s_donID
+        );
+        s_requestIdToMemberAddress[s_lastRequestId] = msg.sender;
+        s_memberToData[msg.sender].ensName = ensName;
+        emit Request(msg.sender, args[0], s_lastRequestId);
+        return s_lastRequestId;
+    }
+
+    /**
+     * @notice Chainlink node calls this funciton to fulfill a request
+     * @param requestId The ID of the request to fulfill
+     * @param response the encoded uint256 response from off chain JS execution
+     * @ param err Any errors from the Functions request
+     */
+    function fulfillRequest(
+        bytes32 requestId,
+        bytes memory response,
+        bytes memory /* err */
+    ) internal override {
+        if (s_lastRequestId != requestId) {
+            revert UnexpectedRequestID(requestId); // Check if request IDs match
+        }
+        address member = s_requestIdToMemberAddress[requestId];
+        uint256 buildCount = abi.decode(response, (uint256));
+        s_memberToData[member].buildCount = buildCount;
+        emit Response(requestId, member, buildCount);
+    }
+
+    /**
+     * @notice Only BuidlGuidl members with at least 1 published build can mint NFTs
+     */
+    function mintNft() public {
+        if (!s_hasMinted[msg.sender]) {
+            revert AlreadyMinted(msg.sender);
+        }
+        if (s_memberToData[msg.sender].buildCount > 0) {
+            revert MustShipAtLeastOneBuild(msg.sender);
+        }
+        _safeMint(msg.sender, s_tokenCounter);
+        s_hasMinted[msg.sender] = true;
+        emit Minted(msg.sender, s_tokenCounter);
+        s_tokenCounter++;
+    }
+
+    ////////// Getters //////////
+
     /**
      * @param tokenId used to select background color
      */
@@ -138,7 +206,6 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         uint256 tokenId
     ) public view override returns (string memory) {
         require(tokenId < s_tokenCounter, "Token id does not exist.");
-        string memory imageURI = svgToImageURI(tokenId);
         uint256 memberBuildCount = s_memberToData[ownerOf(tokenId)].buildCount;
 
         RarityTier tier;
@@ -153,6 +220,7 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
         }
 
         RarityAttributes memory rarity = s_rarityDetails[tier];
+        string memory imageURI = svgToImageURI(tokenId, rarity.hexColor);
 
         return
             string(
@@ -180,23 +248,9 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
      * @param tokenId looks up owner address to lookup buildCount to determine background color
      */
     function svgToImageURI(
-        uint256 tokenId
-    ) public view returns (string memory) {
-        address ownerAddr = ownerOf(tokenId);
-        uint256 memberBuildCount = s_memberToData[ownerAddr].buildCount;
-        RarityTier tier;
-        if (memberBuildCount < 5) {
-            tier = RarityTier.Uncommon;
-        } else if (memberBuildCount < 10) {
-            tier = RarityTier.Rare;
-        } else if (memberBuildCount < 15) {
-            tier = RarityTier.Epic;
-        } else {
-            tier = RarityTier.Legendary;
-        }
-
-        RarityAttributes memory rarity = s_rarityDetails[tier];
-        string memory color = rarity.hexColor;
+        uint256 tokenId,
+        string memory color
+    ) private view returns (string memory) {
         string memory svgTop = buildSvgTop(color);
         string memory svgBottom = buildSvgBottom(color, tokenId);
         string memory svgBase64Encoded = Base64.encode(
@@ -290,71 +344,6 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
             );
     }
 
-    /** @notice sends request to chainlink node for off chain execution of JS source code
-     * @param subscriptionId registered with chainlink (must have added this contract as a consumer)
-     * @param args the arguments to pass to the javascript source code
-     * @param ensName ens name resolved by frontend and passed in as an argument for updating the svg
-     */
-    function sendRequest(
-        uint64 subscriptionId,
-        string[] calldata args,
-        string memory ensName
-    ) external returns (bytes32 requestId) {
-        FunctionsRequest.Request memory req;
-        req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
-        if (args.length > 0) req.setArgs(args); // Set the arguments for the request
-        // Send the request and store the request ID
-        s_lastRequestId = _sendRequest(
-            req.encodeCBOR(),
-            subscriptionId,
-            s_gasLimit,
-            s_donID
-        );
-        s_requestIdToMemberAddress[s_lastRequestId] = msg.sender;
-        s_memberToData[msg.sender].ensName = ensName;
-        emit Request(msg.sender, args[0], s_lastRequestId);
-        return s_lastRequestId;
-    }
-
-    /**
-     * @notice Callback function for fulfilling a request
-     * @param requestId The ID of the request to fulfill
-     * @param response The HTTP response data
-     * @ param err Any errors from the Functions request
-     */
-    function fulfillRequest(
-        bytes32 requestId,
-        bytes memory response,
-        bytes memory /* err */
-    ) internal override {
-        if (s_lastRequestId != requestId) {
-            revert UnexpectedRequestID(requestId); // Check if request IDs match
-        }
-        address member = s_requestIdToMemberAddress[requestId];
-        uint256 buildCount = abi.decode(response, (uint256));
-        s_memberToData[member].buildCount = buildCount;
-        emit Response(requestId, member, buildCount);
-    }
-
-    /**
-     * May try to handle minting with chainlink automation by listening for "Response" event from function above
-     */
-    function mintNft() public {
-        require(
-            !s_hasMinted[msg.sender],
-            "BuidlGuidl members are only allowed to mint one NFT"
-        );
-        require(
-            s_memberToData[msg.sender].buildCount > 0,
-            "You must ship at least one build to earn NFT"
-        );
-        _safeMint(msg.sender, s_tokenCounter);
-        s_hasMinted[msg.sender] = true;
-        emit Minted(msg.sender, s_tokenCounter);
-        s_tokenCounter++;
-    }
-
-    // Getters
     function getBuidlCount(address memberAddr) public view returns (uint256) {
         return s_memberToData[memberAddr].buildCount;
     }

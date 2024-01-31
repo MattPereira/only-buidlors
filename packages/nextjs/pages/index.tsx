@@ -188,7 +188,7 @@ const Home: NextPage = () => {
       updateImageWithFade("/step-3.jpg");
     } else if (stepsCompleted === 1) {
       updateImageWithFade("/step-2.jpg");
-    } else if (requestTxIsMining || requestTxIsLoading) {
+    } else if ((requestTxIsMining || requestTxIsLoading) && stepsCompleted === 0) {
       updateImageWithFade("/step-1.jpg");
     } else {
       updateImageWithFade("/pixel-art.jpg");
@@ -199,7 +199,7 @@ const Home: NextPage = () => {
     <>
       <MetaHeader />
       <section className="p-5 md:p-10 lg:px-16 2xl:p-24 grow flex flex-col">
-        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-14 pb-20 items-end border-b border-primary">
           <div>
             <div className="flex justify-center lg:justify-start">
               <div className="mr-5 w-[120px] h-[120px] lg:w-[200px] lg:h-[300px]">
@@ -228,7 +228,7 @@ const Home: NextPage = () => {
 
         <div className="grow flex flex-col items-center justify-center py-10">
           {isBuilder ? (
-            <div className="grid grid-cols-1 2xl:grid-cols-2 gap-20 items-center">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-20 items-center">
               <div>
                 {steps.map(step => (
                   <div key={step.number} className="text-2xl flex gap-4 mb-8 items-start">
