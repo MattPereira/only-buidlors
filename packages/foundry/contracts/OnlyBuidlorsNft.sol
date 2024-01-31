@@ -185,10 +185,10 @@ contract OnlyBuidlorsNft is ERC721, FunctionsClient, ConfirmedOwner {
      * @notice Only BuidlGuidl members with at least 1 published build can mint NFTs
      */
     function mintNft() public {
-        if (!s_hasMinted[msg.sender]) {
+        if (s_hasMinted[msg.sender]) {
             revert AlreadyMinted(msg.sender);
         }
-        if (s_memberToData[msg.sender].buildCount > 0) {
+        if (s_memberToData[msg.sender].buildCount < 1) {
             revert MustShipAtLeastOneBuild(msg.sender);
         }
         _safeMint(msg.sender, s_tokenCounter);
